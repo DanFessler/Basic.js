@@ -1,0 +1,11 @@
+{
+  "name": "jsbasic",
+  "version": "1.0.0",
+  "description": "A BASIC interpreter written in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "node . ./programs/HelloWorld.BAS"
+  },
+  "author": "Dan Fessler",
+  "license": "MIT"
+}

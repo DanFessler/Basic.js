@@ -1,4 +1,4 @@
-const BASIC = require("./interpreter");
+const BASIC = require("./src");
 
 // Make sure we got a filename on the command line.
 if (process.argv.length < 3) {

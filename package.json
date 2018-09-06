@@ -3,10 +3,21 @@
   "version": "1.0.0",
   "description": "A BASIC interpreter written in JavaScript",
   "main": "index.js",
+  "watch": {
+    "test": {
+      "patterns": ["src", "programs"],
+      "extensions": "js,BAS"
+    }
+  },
   "scripts": {
     "test": "node index.js ./programs/HelloWorld.BAS",
-    "start": "node index.js"
+    "start": "node index.js",
+    "watch": "npm-watch"
   },
   "author": "Dan Fessler",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "bason": "^1.0.3",
+    "npm-watch": "^0.3.0"
+  }
 }

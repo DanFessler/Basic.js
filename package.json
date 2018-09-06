@@ -4,7 +4,8 @@
   "description": "A BASIC interpreter written in JavaScript",
   "main": "index.js",
   "scripts": {
-    "test": "node . ./programs/HelloWorld.BAS"
+    "test": "node index.js ./programs/HelloWorld.BAS",
+    "start": "node index.js"
   },
   "author": "Dan Fessler",
   "license": "MIT"

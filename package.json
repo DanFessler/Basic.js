@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "test": "node index.js ./programs/HelloWorld.BAS",
+    "test": "node index.js ./programs/COINTOSS.BAS",
     "start": "node index.js",
     "watch": "npm-watch"
   },

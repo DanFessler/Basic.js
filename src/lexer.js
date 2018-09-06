@@ -5,16 +5,20 @@ module.exports = data => {
     let token = "";
     let type = null;
 
-    //console.log(statement)
+    console.log(statement);
 
     for (let i = 0; i < statement.length; i++) {
       token += statement[i];
-      if (token == " ") token = "";
 
       // Determine what token type we're defining
       if (type == null) type = identify(token);
 
       switch (type) {
+        case "ws":
+          if (!RegExp(/\s/).test(statement[i])) {
+            token = push(token, 1, true);
+          }
+          break;
         case "str":
           if (statement[i] == '"' && token.length > 1) {
             token = push(token.substring(1, token.length - 1), 0);
@@ -26,7 +30,7 @@ module.exports = data => {
           }
           break;
         case "opr":
-          if (!RegExp(/\+|\-|\*|\//).test(statement[i])) {
+          if (!RegExp(/\+|\-|\*|\/|\=|\(|\)|\,0/).test(statement[i])) {
             token = push(token, 1);
           }
           break;
@@ -41,13 +45,12 @@ module.exports = data => {
         token = push(token, 0);
       }
 
-      function push(tok, trim) {
+      function push(tok, trim, dontPush) {
         let oldTok = tok.substr(0, tok.length - trim);
         let newTok = tok.substr(tok.length - trim, tok.length);
-        if (newTok == " ") newTok = "";
         let tokObj = {};
         tokObj[type] = oldTok;
-        tokens.push(tokObj);
+        if (!dontPush) tokens.push(tokObj);
 
         type = identify(newTok);
         return newTok;
@@ -55,9 +58,10 @@ module.exports = data => {
 
       function identify(token) {
         if (token == "") return null;
+        else if (RegExp(/\s/).test(token[0])) return "ws";
         else if (token[0] == `"`) return "str";
         else if (RegExp(/[0-9]/).test(token[0])) return "num";
-        else if (RegExp(/\+|\-|\*|\//).test(token[0])) return "opr";
+        else if (RegExp(/\+|\-|\*|\/|\=|\(|\)|\,/).test(token[0])) return "opr";
         else return "key";
       }
     }

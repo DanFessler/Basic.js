@@ -1,3 +1,7 @@
+// REGEX notes:
+// Identifier: [a-zA-Z](\w+)?
+// Label: [a-zA-Z](\w+)?:
+
 module.exports = data => {
   let tokens = [];
 
@@ -15,8 +19,8 @@ module.exports = data => {
 
       switch (type) {
         case "ws":
-          if (!RegExp(/\s/).test(statement[i])) {
-            token = push(token, 1, true);
+          if (!RegExp(/(\s|\r\r)+/).test(statement[i])) {
+            token = push(token, 1);
           }
           break;
         case "str":
@@ -50,15 +54,15 @@ module.exports = data => {
         let newTok = tok.substr(tok.length - trim, tok.length);
         let tokObj = {};
         tokObj[type] = oldTok;
-        if (!dontPush) tokens.push(tokObj);
+        if (type !== "ws") tokens.push(tokObj);
 
         type = identify(newTok);
         return newTok;
       }
 
       function identify(token) {
-        if (token == "") return null;
-        else if (RegExp(/\s/).test(token[0])) return "ws";
+        if (!token) return null;
+        else if (RegExp(/\s|\r/).test(token[0])) return "ws";
         else if (token[0] == `"`) return "str";
         else if (RegExp(/[0-9]/).test(token[0])) return "num";
         else if (RegExp(/\+|\-|\*|\/|\=|\(|\)|\,/).test(token[0])) return "opr";

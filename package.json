@@ -6,7 +6,8 @@
   "watch": {
     "test": {
       "patterns": ["src", "programs", "index.js"],
-      "extensions": "js,BAS"
+      "extensions": "js,BAS",
+      "quiet": "true"
     }
   },
   "scripts": {

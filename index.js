@@ -3,17 +3,18 @@ const Lexer = require("./src/lexer2.js");
 
 const newlex = new Lexer({
   rules: {
-    END: /^(\r|\n)+$/,
+    COM: /^\/+.*$/,
     SPC: /^\s+$/,
+    END: /^(\r|\n)+$/,
     SEP: /^,$/,
     LPR: /^\($/,
     RPR: /^\)$/,
     STR: /^".*"?$/,
     NUM: /^[0-9]+\.?([0-9]+)?$/,
     KEY: /^[a-zA-Z](\w+)?$/,
-    OPR: /^(=|\+|-|\*|\/|%|==|<>|>|<|>=|<=|&|\|)$/
+    OPR: /^(=|\+|-|\*|%|==|<>|>|<|>=|<=|&|\|)$/
   },
-  ignore: ["SPC"]
+  ignore: ["COM", "SPC"]
 });
 
 // Make sure we got a filename on the command line.

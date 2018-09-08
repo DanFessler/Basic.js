@@ -5,14 +5,14 @@
   "main": "index.js",
   "watch": {
     "test": {
-      "patterns": ["src", "programs"],
+      "patterns": ["src", "programs", "index.js"],
       "extensions": "js,BAS"
     }
   },
   "scripts": {
     "test": "node index.js ./programs/COINTOSS.BAS",
     "start": "node index.js",
-    "watch": "npm-watch"
+    "watch": "npm-watch test"
   },
   "author": "Dan Fessler",
   "license": "MIT",

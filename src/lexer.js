@@ -19,7 +19,7 @@ module.exports = data => {
 
       switch (type) {
         case "ws":
-          if (!RegExp(/(\s|\r\r)+/).test(statement[i])) {
+          if (!RegExp(/\s/).test(statement[i])) {
             token = push(token, 1);
           }
           break;
@@ -34,7 +34,7 @@ module.exports = data => {
           }
           break;
         case "opr":
-          if (!RegExp(/\+|\-|\*|\/|\=|\(|\)|\,0/).test(statement[i])) {
+          if (!RegExp(/\+|\-|\*|\/|\=|\(|\)|\,/).test(statement[i])) {
             token = push(token, 1);
           }
           break;
@@ -62,9 +62,11 @@ module.exports = data => {
 
       function identify(token) {
         if (!token) return null;
-        else if (RegExp(/\s|\r/).test(token[0])) return "ws";
+        else if (RegExp(/\s/).test(token[0])) return "ws";
         else if (token[0] == `"`) return "str";
         else if (RegExp(/[0-9]/).test(token[0])) return "num";
+        // else if (token[0] == "(") return "lpr";
+        // else if (token[0] == ")") return "rpr";
         else if (RegExp(/\+|\-|\*|\/|\=|\(|\)|\,/).test(token[0])) return "opr";
         else return "key";
       }

@@ -1,4 +1,20 @@
 const BASIC = require("./src");
+const Lexer = require("./src/lexer2.js");
+
+const newlex = new Lexer({
+  rules: {
+    END: /^(\r|\n)+$/,
+    SPC: /^\s+$/,
+    SEP: /^,$/,
+    LPR: /^\($/,
+    RPR: /^\)$/,
+    STR: /^".*"?$/,
+    NUM: /^[0-9]+\.?([0-9]+)?$/,
+    KEY: /^[a-zA-Z](\w+)?$/,
+    OPR: /^(=|\+|-|\*|\/|%|==|<>|>|<|>=|<=|&|\|)$/
+  },
+  ignore: ["SPC"]
+});
 
 // Make sure we got a filename on the command line.
 if (process.argv.length < 3) {
@@ -11,5 +27,8 @@ let filename = process.argv[2];
 
 fs.readFile(filename, "utf8", function(err, data) {
   if (err) throw err;
-  BASIC(data);
+  // BASIC(data);
+
+  // console.log(newlex.lex(data));
+  newlex.lex(data).map(token => console.log(token));
 });

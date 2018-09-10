@@ -1,4 +1,4 @@
-const Tokenize = require("./lexer.js");
+const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
 let bason = require("bason");
 
@@ -15,7 +15,7 @@ bason.Stack = [
 ];
 
 module.exports = program => {
-  program = Tokenize(program);
+  program = Lexer(program);
   program = Parser(program);
   console.log(program);
   // bason.RUN(program);

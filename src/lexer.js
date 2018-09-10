@@ -1,79 +1,107 @@
-// REGEX notes:
-// Identifier: [a-zA-Z](\w+)?
-// Label: [a-zA-Z](\w+)?:
+const config = {
+  rules: [
+    { name: "END", pattern: /^(\r|\n)+$/ },
+    { name: "COM", pattern: /^\/+.*$/ },
+    { name: "SPC", pattern: /^\s+$/ },
+    { name: "SEP", pattern: /^,$/ },
+    { name: "LPR", pattern: /^\($/ },
+    { name: "RPR", pattern: /^\)$/ },
+    { name: "STR", pattern: /^\"(.*?)"?$/s, end: /^\".*"$/s, capture: 1 },
+    { name: "NUM", pattern: /^[0-9]+\.?([0-9]+)?$/ },
+    { name: "KEY", pattern: /^[a-zA-Z](\w+)?$/ },
+    { name: "OPR", pattern: /^(:|\+|-|\*|%|=|<>|>|<|>=|<=|&|\|)$/ }
+  ],
+  ignore: ["COM", "SPC", "END"]
+};
 
-module.exports = data => {
-  let tokens = [];
+class Lexer {
+  constructor(rules) {
+    this.line = 1;
+    this.char = 1;
+    this.pos = 0;
+    this.tokens = [];
+    this.rules = rules.rules;
+    this.ignore = rules.ignore;
+  }
 
-  data.split(/\r\n/).forEach(function(statement) {
-    let token = "";
-    let type = null;
+  tokenize(string) {
+    while (this.pos < string.length) {
+      let thisTok = { type: null, token: "" };
 
-    console.log(statement);
+      // Loop through rules to find type match
+      for (let i = 0; i < this.rules.length; i++) {
+        let token = this.rules[i];
 
-    for (let i = 0; i < statement.length; i++) {
-      token += statement[i];
+        // If the first character matched a rule, keep
+        // adding characters until it no longer matches
+        // and add it to the token stack
+        if (token.pattern.test(string[this.pos])) {
+          thisTok.type = token.name;
 
-      // Determine what token type we're defining
-      if (type == null) type = identify(token);
+          let loop = true;
+          while (loop) {
+            thisTok.token += string[this.pos];
 
-      switch (type) {
-        case "ws":
-          if (!RegExp(/\s/).test(statement[i])) {
-            token = push(token, 1);
+            // Update line:char tracking
+            if (string[this.pos] == "\n") {
+              this.line++;
+              this.char = 1;
+            }
+            this.pos++;
+            this.char++;
+
+            // if we failed to match or reached the end of the content,
+            // then we're done with this token
+            if (
+              !token.pattern.test(thisTok.token + string[this.pos]) ||
+              this.pos >= string.length
+            ) {
+              loop = false;
+            }
+            // if token rule has an end condition, check it as well
+            else if (
+              token.end &&
+              token.end.test(thisTok.token) &&
+              thisTok.token.length > 1
+            ) {
+              loop = false;
+            }
           }
-          break;
-        case "str":
-          if (statement[i] == '"' && token.length > 1) {
-            token = push(token.substring(1, token.length - 1), 0);
+
+          // Push finished token to the stack
+          if (this.ignore.indexOf(thisTok.type) === -1) {
+            // if the rule has a capture group, use it to generate final token
+            let processedToken = token.capture
+              ? thisTok.token.match(token.pattern)[token.capture]
+              : thisTok.token;
+
+            this.tokens.push({ [thisTok.type]: processedToken });
           }
-          break;
-        case "num":
-          if (!RegExp(/[0-9]/).test(statement[i])) {
-            token = push(token, 1);
-          }
-          break;
-        case "opr":
-          if (!RegExp(/\+|\-|\*|\/|\=|\(|\)|\,/).test(statement[i])) {
-            token = push(token, 1);
-          }
-          break;
-        case "key":
-          if (!RegExp(/[a-zA-Z0-9]/).test(statement[i])) {
-            token = push(token, 1);
-          }
-          break;
+          break; // prevent applying additional rules
+        }
       }
 
-      if (i == statement.length - 1 && type !== null) {
-        token = push(token, 0);
-      }
-
-      function push(tok, trim, dontPush) {
-        let oldTok = tok.substr(0, tok.length - trim);
-        let newTok = tok.substr(tok.length - trim, tok.length);
-        let tokObj = {};
-        tokObj[type] = oldTok;
-        if (type !== "ws") tokens.push(tokObj);
-
-        type = identify(newTok);
-        return newTok;
-      }
-
-      function identify(token) {
-        if (!token) return null;
-        else if (RegExp(/\s/).test(token[0])) return "ws";
-        else if (token[0] == `"`) return "str";
-        else if (RegExp(/[0-9]/).test(token[0])) return "num";
-        // else if (token[0] == "(") return "lpr";
-        // else if (token[0] == ")") return "rpr";
-        else if (RegExp(/\+|\-|\*|\/|\=|\(|\)|\,/).test(token[0])) return "opr";
-        else return "key";
+      // if no rule matched, Error
+      if (thisTok.type === null) {
+        var rx = new RegExp(`(?:.*?\n){${this.line - 1}}(.+?)\n`, "s");
+        let linePrefix = `${this.line} | `;
+        console.error(
+          "\x1b[31m%s\x1b[0m",
+          `\nSyntaxError: Unexpected Token '${string[this.pos]}' on line ${
+            this.line
+          }:${this.char - 1}`,
+          "\n" +
+            "\u001b[38;5;239m" +
+            linePrefix +
+            "\x1b[0m" +
+            `${string.match(rx)[1]}\n`,
+          " ".repeat(this.char - 3 + linePrefix.length) + "^\n"
+        );
+        break;
       }
     }
+    return this.tokens;
+  }
+}
 
-    tokens.push({ end: null });
-  });
-
-  return tokens;
-};
+module.exports = data => new Lexer(config).tokenize(data);

@@ -13,7 +13,6 @@ module.exports = class Lexer {
       let thisTok = { type: null, token: "" };
 
       // Loop through rules to find type match
-      // for (let token in this.rules) {
       for (let i = 0; i < this.rules.length; i++) {
         let token = this.rules[i];
 
@@ -22,24 +21,29 @@ module.exports = class Lexer {
         // and add it to the token stack
         if (token.pattern.test(string[this.pos])) {
           thisTok.type = token.name;
+
           let loop = true;
           while (loop) {
             thisTok.token += string[this.pos];
-            this.pos++;
-            this.char++;
 
-            // Update line:char tracking for error reporting
+            // Update line:char tracking
             if (string[this.pos] == "\n") {
               this.line++;
               this.char = 1;
             }
+            this.pos++;
+            this.char++;
 
+            // if we failed to match or reached the end of the content,
+            // then we're done with this token
             if (
               !token.pattern.test(thisTok.token + string[this.pos]) ||
               this.pos >= string.length
             ) {
               loop = false;
-            } else if (
+            }
+            // if token rule has an end condition, check it as well
+            else if (
               token.end &&
               token.end.test(thisTok.token) &&
               thisTok.token.length > 1
@@ -48,6 +52,7 @@ module.exports = class Lexer {
             }
           }
 
+          // Push finished token to the stack
           if (this.ignore.indexOf(thisTok.type) === -1) {
             // if the rule has a capture group, use it to generate final token
             let processedToken = token.capture

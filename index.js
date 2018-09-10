@@ -16,10 +16,10 @@ const newlex = new Lexer({
     { name: "SEP", pattern: /^,$/ },
     { name: "LPR", pattern: /^\($/ },
     { name: "RPR", pattern: /^\)$/ },
-    { name: "STR", pattern: /^\".*$/s, endPattern: /^\"(.*)"$/s, capture: 1 },
+    { name: "STR", pattern: /^\"(.*?)"?$/s, end: /^\".*"$/s, capture: 1 },
     { name: "NUM", pattern: /^[0-9]+\.?([0-9]+)?$/ },
     { name: "KEY", pattern: /^[a-zA-Z](\w+)?$/ },
-    { name: "OPR", pattern: /^(=|\+|-|\*|%|==|<>|>|<|>=|<=|&|\|)$/ }
+    { name: "OPR", pattern: /^(:|\+|-|\*|%|=|<>|>|<|>=|<=|&|\|)$/ }
   ],
   ignore: ["COM", "SPC", "END"]
 });

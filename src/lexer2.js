@@ -27,7 +27,12 @@ module.exports = class Lexer {
             thisTok.token += string[this.pos];
             this.pos++;
             this.char++;
-            // console.log(thisTok.type);
+
+            // Update line:char tracking for error reporting
+            if (string[this.pos] == "\n") {
+              this.line++;
+              this.char = 1;
+            }
 
             if (
               !token.pattern.test(thisTok.token + string[this.pos]) ||
@@ -35,18 +40,21 @@ module.exports = class Lexer {
             ) {
               loop = false;
             } else if (
-              token.endPattern &&
-              token.endPattern.test(thisTok.token) &&
+              token.end &&
+              token.end.test(thisTok.token) &&
               thisTok.token.length > 1
             ) {
               loop = false;
             }
           }
-          if (this.ignore.indexOf(thisTok.type) === -1)
-            this.tokens.push({ [thisTok.type]: thisTok.token });
-          if (thisTok.type === "END") {
-            this.line++;
-            this.char = 1;
+
+          if (this.ignore.indexOf(thisTok.type) === -1) {
+            // if the rule has a capture group, use it to generate final token
+            let processedToken = token.capture
+              ? thisTok.token.match(token.pattern)[token.capture]
+              : thisTok.token;
+
+            this.tokens.push({ [thisTok.type]: processedToken });
           }
           break; // prevent applying additional rules
         }
@@ -54,18 +62,19 @@ module.exports = class Lexer {
 
       // if no rule matched, Error
       if (thisTok.type === null) {
-        var rx = new RegExp(`(?:.*?\n){${this.line}}(.+?)\n`, "s");
-        let linePrefix = `${this.line + 1} | `;
+        var rx = new RegExp(`(?:.*?\n){${this.line - 1}}(.+?)\n`, "s");
+        let linePrefix = `${this.line} | `;
         console.error(
           "\x1b[31m%s\x1b[0m",
-          `\nSyntaxError: Unexpected Token '${string[this.pos]}' on line ${this
-            .line + 1}:${this.char}`,
+          `\nSyntaxError: Unexpected Token '${string[this.pos]}' on line ${
+            this.line
+          }:${this.char - 1}`,
           "\n" +
             "\u001b[38;5;239m" +
             linePrefix +
             "\x1b[0m" +
             `${string.match(rx)[1]}\n`,
-          " ".repeat(this.char - 2 + linePrefix.length) + "^\n"
+          " ".repeat(this.char - 3 + linePrefix.length) + "^\n"
         );
         break;
       }

@@ -1,9 +1,9 @@
 for i: 1 to 100
-  if (i%15) = 0 then
+  if (i % 15) = 0
     print "FizzBuzz"
-  elseif (i%5) = 0 then
+  else if (i % 5) = 0
     print "Buzz"
-  elseif (i % 3) = 0 then
+  else if (i % 3) = 0
     print "Fizz"
   else
     print i

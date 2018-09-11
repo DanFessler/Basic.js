@@ -4,12 +4,28 @@ const config = {
     { name: "COM", pattern: /^\/+.*$/ },
     { name: "SPC", pattern: /^\s+$/ },
     { name: "SEP", pattern: /^,$/ },
-    { name: "LPR", pattern: /^\($/ },
-    { name: "RPR", pattern: /^\)$/ },
-    { name: "STR", pattern: /^\"(.*?)"?$/s, end: /^\".*"$/s, capture: 1 },
+    { name: "GRP", pattern: /^(\(|\))$/ },
+    // { name: "RPR", pattern: /^\)$/ },
+    {
+      name: "STR",
+      pattern: /^\"([\s\S]*?)"?$/,
+      end: /^\"[\s\S]*"$/,
+      capture: 1
+    },
     { name: "NUM", pattern: /^[0-9]+\.?([0-9]+)?$/ },
-    { name: "KEY", pattern: /^[a-zA-Z](\w+)?$/ },
+    { name: "IDN", pattern: /^[a-zA-Z](\w+)?$/i },
     { name: "OPR", pattern: /^(:|\+|-|\*|%|=|<>|>|<|>=|<=|&|\|)$/ }
+  ],
+  keywords: [
+    "for",
+    "to",
+    "next",
+    "if",
+    "then",
+    "elseif",
+    "else",
+    "endif",
+    "print"
   ],
   ignore: ["COM", "SPC", "END"]
 };
@@ -22,6 +38,7 @@ class Lexer {
     this.tokens = [];
     this.rules = rules.rules;
     this.ignore = rules.ignore;
+    this.keywords = rules.keywords;
   }
 
   tokenize(string) {
@@ -57,19 +74,26 @@ class Lexer {
               this.pos >= string.length
             ) {
               loop = false;
-            }
-            // if token rule has an end condition, check it as well
-            else if (
+            } else if (
               token.end &&
               token.end.test(thisTok.token) &&
               thisTok.token.length > 1
             ) {
+              // if token rule has an end condition, check it as well
               loop = false;
             }
           }
 
           // Push finished token to the stack
           if (this.ignore.indexOf(thisTok.type) === -1) {
+            // if token is a reserved keyword, change the type
+            for (let key in this.keywords) {
+              if (
+                thisTok.token.toLowerCase() === this.keywords[key].toLowerCase()
+              )
+                thisTok.type = "KEY";
+            }
+
             // if the rule has a capture group, use it to generate final token
             let processedToken = token.capture
               ? thisTok.token.match(token.pattern)[token.capture]

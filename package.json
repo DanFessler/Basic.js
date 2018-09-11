@@ -5,7 +5,11 @@
   "main": "index.js",
   "watch": {
     "test": {
-      "patterns": ["src", "programs", "index.js"],
+      "patterns": [
+        "src",
+        "programs",
+        "index.js"
+      ],
       "extensions": "js,BAS",
       "quiet": "true"
     }

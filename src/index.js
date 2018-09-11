@@ -17,6 +17,6 @@ bason.Stack = [
 module.exports = program => {
   program = Lexer(program);
   program = Parser(program);
-  console.log(program);
-  // bason.RUN(program);
+  // console.log(program);
+  bason.RUN(program);
 };

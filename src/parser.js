@@ -16,8 +16,30 @@
 // Target result:
 // [{ "ADD": [a, b] }, { "SUB": [a, b] }]
 
+// 5 + 2 * 3
+// print (5 + (2 * 3)) = 11
+// NOT   ((5 + 2) * 3) = 21
+
+let result = [{ ADD: [5, { MUL: [2, 3] }] }];
+
+// token: "print",
+// is type "key"?
+// YES
+// check rule for "print": expression
+// loop through tokens until rule not satisfied
+
+let opTable = {
+  "+": "ADD",
+  "-": "SUB",
+  "*": "MUL",
+  "/": "DIV"
+};
+
 class Parser {
-  constructor(rules) {
+  constructor(tokens) {
+    this.program = [];
+    this.pos = 0;
+    this.tokens = tokens;
     this.grammar = [
       {
         print: "STR"
@@ -25,29 +47,68 @@ class Parser {
     ];
   }
 
-  parse(tokens) {
-    let program = [];
-    let pos = 0;
-    while (pos < tokens.length) {
+  parse() {
+    let tokens = this.tokens;
+    console.log(tokens);
+    while (this.pos < tokens.length) {
       let line = {};
-      let token = {
-        type: Object.keys(tokens[pos])[0],
-        value: tokens[pos][Object.keys(tokens[pos])[0]]
-      };
-      for (let i = 0; i < this.grammar.length; i++) {
-        if (
-          Object.keys(this.grammar[i])[0].toLowerCase() ===
-          token.value.toLowerCase()
-        ) {
-          line[token.value] = tokens[pos + 1].STR;
-          program.push(line);
-        }
+      let token = tokens[this.pos];
+
+      // check for keyword
+      if (this.isKeyword(token)) {
+        line[token.lexeme] = tokens[this.pos + 1].lexeme;
+        this.program.push(line);
+      } else {
+        this.program.push(this.parseExpression());
       }
-      pos++;
+
+      this.pos++;
     }
-    console.log(program);
-    return program;
+    console.log(JSON.stringify(this.program, 2, 2));
+    return this.program;
+  }
+
+  isKeyword(token) {
+    for (let i = 0; i < this.grammar.length; i++) {
+      if (
+        Object.keys(this.grammar[i])[0].toLowerCase() ===
+        token.lexeme.toLowerCase()
+      ) {
+        return true;
+      }
+    }
+  }
+
+  isLiteral(token) {}
+
+  parseExpression(precedence) {
+    let token = this.tokens[this.pos];
+    let nextToken = this.tokens[this.pos + 1];
+    // console.log(token);
+    if (token.type == "NUM") {
+      if (nextToken && nextToken.type == "OPR") {
+        let thisPrecedence;
+        if ((nextToken.lexeme == "+") | (nextToken.lexeme == "-"))
+          thisPrecedence = 1;
+        if ((nextToken.lexeme == "*") | (nextToken.lexeme == "/"))
+          thisPrecedence = 2;
+        if (precedence && thisPrecedence < precedence) {
+          return Number(token.lexeme);
+        } else {
+          // console.log([precedence, thisPrecedence]);
+          this.pos += 2;
+          return {
+            [opTable[nextToken.lexeme]]: [
+              Number(token.lexeme),
+              this.parseExpression(thisPrecedence)
+            ]
+          };
+        }
+      } else {
+        return Number(token.lexeme);
+      }
+    }
   }
 }
 
-module.exports = tokens => new Parser().parse(tokens);
+module.exports = tokens => new Parser(tokens).parse();

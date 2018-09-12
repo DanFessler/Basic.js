@@ -43,7 +43,7 @@ class Lexer {
 
   tokenize(string) {
     while (this.pos < string.length) {
-      let thisTok = { type: null, token: "" };
+      let thisTok = { type: null, lexeme: "" };
 
       // Loop through rules to find type match
       for (let i = 0; i < this.rules.length; i++) {
@@ -57,7 +57,7 @@ class Lexer {
 
           let loop = true;
           while (loop) {
-            thisTok.token += string[this.pos];
+            thisTok.lexeme += string[this.pos];
 
             // Update line:char tracking
             if (string[this.pos] == "\n") {
@@ -70,14 +70,14 @@ class Lexer {
             // if we failed to match or reached the end of the content,
             // then we're done with this token
             if (
-              !token.pattern.test(thisTok.token + string[this.pos]) ||
+              !token.pattern.test(thisTok.lexeme + string[this.pos]) ||
               this.pos >= string.length
             ) {
               loop = false;
             } else if (
               token.end &&
-              token.end.test(thisTok.token) &&
-              thisTok.token.length > 1
+              token.end.test(thisTok.lexeme) &&
+              thisTok.lexeme.length > 1
             ) {
               // if token rule has an end condition, check it as well
               loop = false;
@@ -89,17 +89,18 @@ class Lexer {
             // if token is a reserved keyword, change the type
             for (let key in this.keywords) {
               if (
-                thisTok.token.toLowerCase() === this.keywords[key].toLowerCase()
+                thisTok.lexeme.toLowerCase() ===
+                this.keywords[key].toLowerCase()
               )
                 thisTok.type = "KEY";
             }
 
             // if the rule has a capture group, use it to generate final token
-            let processedToken = token.capture
-              ? thisTok.token.match(token.pattern)[token.capture]
-              : thisTok.token;
+            thisTok.lexeme = token.capture
+              ? thisTok.lexeme.match(token.pattern)[token.capture]
+              : thisTok.lexeme;
 
-            this.tokens.push({ [thisTok.type]: processedToken });
+            this.tokens.push(thisTok);
           }
           break; // prevent applying additional rules
         }

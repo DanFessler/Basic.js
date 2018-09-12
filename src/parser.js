@@ -2,19 +2,16 @@
 //   keyword...
 //
 // expression:
-//   identifier | literal | grouping | operation | function
+//   IDN | literal | grouping | operation | function
 //
 // literal:
-//   string | number | "true" | "false"
+//   STR | NUM | "true" | "false"
 //
 // grouping:
-//   "(" expression ")"
+//   GRP:"(" expression GRP:")"
 //
 // operation:
-//   expression operator expression
-//
-// operator:
-//   +, -, *, /, etc...
+//   expression OPR expression
 
 // Target result:
 // [{ "ADD": [a, b] }, { "SUB": [a, b] }]

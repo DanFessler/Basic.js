@@ -84,32 +84,20 @@ class Parser {
 
   isLiteral(token) {}
 
-  // { "ADD": [{ "MUL": [5, 2] }, b] }
   parseExpression(precedenceList) {
-    // console.log(this.pos);
     if (this.pos > precedenceList.length - 1) return null;
+
     let test;
     while (this.pos < precedenceList.length) {
-      let condition;
-      if (this.pos == 0) condition = true;
-      if (this.pos == 1) condition = false;
-      if (this.pos == 2) condition = false;
-      if (this.pos == 3) condition = false;
-
       if (
         this.pos > 0 &&
         precedenceList[this.pos] < precedenceList[this.pos - 1]
-        // true
-        // condition
       ) {
         test = {
-          [`test${this.pos}`]: [
-            this.pos++,
-            this.parseExpression(precedenceList)
-          ]
+          [`test${this.pos++}`]: [test, this.parseExpression(precedenceList)]
         };
       } else {
-        test = { [`test${this.pos}`]: [this.pos++, test] };
+        test = { [`test${this.pos++}`]: [test, "token"] };
       }
     }
     console.log(test);

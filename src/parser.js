@@ -15,6 +15,7 @@
 
 // Target result:
 // [{ "ADD": [a, b] }, { "SUB": [a, b] }]
+// [{ "ADD": [{ "MUL": [5, 2] }, b] }]
 
 // 5 + 2 * 3
 // print (5 + (2 * 3)) = 11
@@ -81,32 +82,72 @@ class Parser {
 
   isLiteral(token) {}
 
-  parseExpression(precedence) {
-    let token = this.tokens[this.pos];
-    let nextToken = this.tokens[this.pos + 1];
-    // console.log(token);
-    if (token.type == "NUM") {
-      if (nextToken && nextToken.type == "OPR") {
-        let thisPrecedence;
-        if ((nextToken.lexeme == "+") | (nextToken.lexeme == "-"))
-          thisPrecedence = 1;
-        if ((nextToken.lexeme == "*") | (nextToken.lexeme == "/"))
-          thisPrecedence = 2;
-        if (precedence && thisPrecedence < precedence) {
-          return Number(token.lexeme);
-        } else {
-          // console.log([precedence, thisPrecedence]);
-          this.pos += 2;
-          return {
-            [opTable[nextToken.lexeme]]: [
-              Number(token.lexeme),
-              this.parseExpression(thisPrecedence)
-            ]
-          };
-        }
+  // { "ADD": [{ "MUL": [5, 2] }, b] }
+  parseExpression(lastExpression, precedence) {
+    if (!lastExpression) {
+      if (this.tokens[this.pos].type === "NUM") {
+        var lastExpression = this.tokens[this.pos].lexeme;
       } else {
-        return Number(token.lexeme);
+        return;
       }
+    }
+
+    let expression;
+    while (
+      this.tokens[this.pos + 1] &&
+      this.tokens[this.pos + 1].type == "OPR"
+    ) {
+      let token = this.tokens[this.pos];
+      let nextToken = this.tokens[this.pos + 1];
+      let operator = nextToken.lexeme;
+
+      let thisPrecedence;
+      if ((operator == "+") | (operator == "-")) thisPrecedence = 1;
+      if ((operator == "*") | (operator == "/")) thisPrecedence = 2;
+
+      this.pos += 2;
+      // if (precedence && thisPrecedence < precedence) {
+      //   return Number(token.lexeme);
+      // } else {
+      return {
+        [opTable[operator]]: [
+          lastExpression,
+          this.parseExpression(null, thisPrecedence)
+        ]
+      };
+      // }
+    }
+
+    return Number(this.tokens[this.pos].lexeme);
+  }
+
+  parseExpressionOLD(precedence) {
+    // console.log(token);
+    while (this.tokens[this.pos + 1].type == "OPR") {
+      let token = this.tokens[this.pos];
+      let nextToken = this.tokens[this.pos + 1];
+      // if (nextToken && nextToken.type == "OPR") {
+      let thisPrecedence;
+      if ((nextToken.lexeme == "+") | (nextToken.lexeme == "-"))
+        thisPrecedence = 1;
+      if ((nextToken.lexeme == "*") | (nextToken.lexeme == "/"))
+        thisPrecedence = 2;
+      if (precedence && thisPrecedence < precedence) {
+        return Number(token.lexeme);
+      } else {
+        // console.log([precedence, thisPrecedence]);
+        this.pos += 2;
+        return {
+          [opTable[nextToken.lexeme]]: [
+            Number(token.lexeme),
+            this.parseExpression(thisPrecedence)
+          ]
+        };
+      }
+    }
+    return Number(token.lexeme);
+    function isExpression() {
+      return;
     }
   }
 }

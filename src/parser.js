@@ -60,11 +60,13 @@ class Parser {
         line[token.lexeme] = tokens[this.pos + 1].lexeme;
         this.program.push(line);
       } else {
-        this.program.push(this.parseExpression());
+        // this.program.push(this.parseExpression(0)
       }
 
       this.pos++;
     }
+    this.pos = 0;
+    this.program.push(this.parseExpression([2, 1, 2, 2]));
     console.log(JSON.stringify(this.program, 2, 2));
     return this.program;
   }
@@ -83,42 +85,35 @@ class Parser {
   isLiteral(token) {}
 
   // { "ADD": [{ "MUL": [5, 2] }, b] }
-  parseExpression(lastExpression, precedence) {
-    if (!lastExpression) {
-      if (this.tokens[this.pos].type === "NUM") {
-        var lastExpression = this.tokens[this.pos].lexeme;
+  parseExpression(precedenceList) {
+    // console.log(this.pos);
+    if (this.pos > precedenceList.length - 1) return null;
+    let test;
+    while (this.pos < precedenceList.length) {
+      let condition;
+      if (this.pos == 0) condition = true;
+      if (this.pos == 1) condition = false;
+      if (this.pos == 2) condition = false;
+      if (this.pos == 3) condition = false;
+
+      if (
+        this.pos > 0 &&
+        precedenceList[this.pos] < precedenceList[this.pos - 1]
+        // true
+        // condition
+      ) {
+        test = {
+          [`test${this.pos}`]: [
+            this.pos++,
+            this.parseExpression(precedenceList)
+          ]
+        };
       } else {
-        return;
+        test = { [`test${this.pos}`]: [this.pos++, test] };
       }
     }
-
-    let expression;
-    while (
-      this.tokens[this.pos + 1] &&
-      this.tokens[this.pos + 1].type == "OPR"
-    ) {
-      let token = this.tokens[this.pos];
-      let nextToken = this.tokens[this.pos + 1];
-      let operator = nextToken.lexeme;
-
-      let thisPrecedence;
-      if ((operator == "+") | (operator == "-")) thisPrecedence = 1;
-      if ((operator == "*") | (operator == "/")) thisPrecedence = 2;
-
-      this.pos += 2;
-      // if (precedence && thisPrecedence < precedence) {
-      //   return Number(token.lexeme);
-      // } else {
-      return {
-        [opTable[operator]]: [
-          lastExpression,
-          this.parseExpression(null, thisPrecedence)
-        ]
-      };
-      // }
-    }
-
-    return Number(this.tokens[this.pos].lexeme);
+    console.log(test);
+    return test;
   }
 
   parseExpressionOLD(precedence) {

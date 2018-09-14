@@ -50,7 +50,7 @@ class Parser {
 
   parse() {
     let tokens = this.tokens;
-    console.log(tokens);
+
     while (this.pos < tokens.length) {
       let line = {};
       let token = tokens[this.pos];
@@ -60,13 +60,12 @@ class Parser {
         line[token.lexeme] = tokens[this.pos + 1].lexeme;
         this.program.push(line);
       } else {
-        // this.program.push(this.parseExpression(0)
+        this.program.push(this.parseExpression());
       }
 
       this.pos++;
     }
     this.pos = 0;
-    this.program.push(this.parseExpression([2, 1, 2, 2]));
     console.log(JSON.stringify(this.program, 2, 2));
     return this.program;
   }
@@ -84,54 +83,28 @@ class Parser {
 
   isLiteral(token) {}
 
-  parseExpression(precedenceList) {
-    if (this.pos > precedenceList.length - 1) return null;
+  parseExpression(lastPrecedence) {
+    let expression = Number(this.tokens[this.pos].lexeme);
+    while (
+      this.tokens[this.pos + 1] &&
+      this.tokens[this.pos + 1].type == "OPR"
+    ) {
+      let operator = this.tokens[this.pos + 1].lexeme;
 
-    let test;
-    while (this.pos < precedenceList.length) {
-      if (
-        this.pos > 0 &&
-        precedenceList[this.pos] < precedenceList[this.pos - 1]
-      ) {
-        test = {
-          [`test${this.pos++}`]: [test, this.parseExpression(precedenceList)]
-        };
-      } else {
-        test = { [`test${this.pos++}`]: [test, "token"] };
-      }
-    }
-    console.log(test);
-    return test;
-  }
+      let precedence;
+      if ((operator == "+") | (operator == "-")) precedence = 1;
+      if ((operator == "*") | (operator == "/")) precedence = 2;
 
-  parseExpressionOLD(precedence) {
-    // console.log(token);
-    while (this.tokens[this.pos + 1].type == "OPR") {
-      let token = this.tokens[this.pos];
-      let nextToken = this.tokens[this.pos + 1];
-      // if (nextToken && nextToken.type == "OPR") {
-      let thisPrecedence;
-      if ((nextToken.lexeme == "+") | (nextToken.lexeme == "-"))
-        thisPrecedence = 1;
-      if ((nextToken.lexeme == "*") | (nextToken.lexeme == "/"))
-        thisPrecedence = 2;
-      if (precedence && thisPrecedence < precedence) {
-        return Number(token.lexeme);
-      } else {
-        // console.log([precedence, thisPrecedence]);
+      if (!lastPrecedence || precedence > lastPrecedence) {
         this.pos += 2;
-        return {
-          [opTable[nextToken.lexeme]]: [
-            Number(token.lexeme),
-            this.parseExpression(thisPrecedence)
-          ]
+        expression = {
+          [opTable[operator]]: [expression, this.parseExpression(precedence)]
         };
+      } else {
+        return expression;
       }
     }
-    return Number(token.lexeme);
-    function isExpression() {
-      return;
-    }
+    return expression;
   }
 }
 

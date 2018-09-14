@@ -1,7 +1,7 @@
 const config = {
   rules: [
     { name: "END", pattern: /^(\r|\n)+$/ },
-    { name: "COM", pattern: /^\/+.*$/ },
+    { name: "COM", pattern: /^\'+.*$/ },
     { name: "SPC", pattern: /^\s+$/ },
     { name: "SEP", pattern: /^,$/ },
     { name: "GRP", pattern: /^(\(|\))$/ },
@@ -14,7 +14,7 @@ const config = {
     },
     { name: "NUM", pattern: /^[0-9]+\.?([0-9]+)?$/ },
     { name: "IDN", pattern: /^[a-zA-Z](\w+)?$/i },
-    { name: "OPR", pattern: /^(:|\+|-|\*|%|=|<>|>|<|>=|<=|&|\|)$/ }
+    { name: "OPR", pattern: /^(:|\+|-|\*|\/|%|=|<>|>|<|>=|<=|&|\|)$/ }
   ],
   keywords: [
     "for",

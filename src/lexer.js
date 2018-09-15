@@ -25,7 +25,9 @@ const config = {
     "elseif",
     "else",
     "endif",
-    "print"
+    "print",
+    "repeat",
+    "endrepeat"
   ],
   ignore: ["COM", "SPC", "END"]
 };
@@ -125,6 +127,7 @@ class Lexer {
         break;
       }
     }
+
     return this.tokens;
   }
 }

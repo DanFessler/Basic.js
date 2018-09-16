@@ -27,7 +27,8 @@ const config = {
     "endif",
     "print",
     "repeat",
-    "endrepeat"
+    "endrepeat",
+    "let"
   ],
   ignore: ["COM", "SPC", "END"]
 };

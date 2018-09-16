@@ -17,18 +17,24 @@ let opTable = {
   "+": "ADD",
   "-": "SUB",
   "*": "MUL",
-  "/": "DIV"
+  "/": "DIV",
+  ":": "SET"
 };
 
 let precedenceTable = {
-  ASSIGNMENT: 1,
-  CONDITIONAL: 2,
-  SUM: 3,
-  PRODUCT: 4,
-  EXPONENT: 5,
-  PREFIX: 6,
-  POSTFIX: 7,
-  CALL: 8
+  // ASSIGNMENT: 1,
+  // CONDITIONAL: 2,
+  // SUM: 3,
+  // PRODUCT: 4,
+  // EXPONENT: 5,
+  // PREFIX: 6,
+  // POSTFIX: 7,
+  // CALL: 8
+  ":": 0,
+  "*": 1,
+  "/": 1,
+  "+": 2,
+  "-": 2
 };
 
 class Parser {
@@ -53,6 +59,8 @@ class Parser {
           case "REPEAT":
             this.parseRepeat();
             break;
+          case "LET":
+            this.parseLet();
           default:
             console.error(`KEY NOT FOUND: "${token.lexeme}"`);
         }
@@ -64,8 +72,19 @@ class Parser {
     }
     this.pos = 0;
 
-    console.log(JSON.stringify(this.program, 2, 2));
     return this.program;
+  }
+
+  parseLet() {
+    this.pos++;
+    let name;
+    let token = this.tokens[this.pos];
+    if (token && token.type == "IDN") {
+      name = token.lexeme;
+      this.pos++;
+    }
+    let value = this.parseExpression();
+    this.program.push({ LET: [name, value] });
   }
 
   parsePrint() {
@@ -98,17 +117,30 @@ class Parser {
 
   parseExpression(lastPrecedence) {
     let expression = Number(this.tokens[this.pos].lexeme);
+    switch (this.tokens[this.pos].type) {
+      case "IDN":
+        if (
+          this.tokens[this.pos + 1] &&
+          this.tokens[this.pos + 1].lexeme == ":"
+        )
+          expression = this.tokens[this.pos].lexeme;
+        else expression = { [this.tokens[this.pos].lexeme]: null };
+        break;
+      case "NUM":
+        expression = Number(this.tokens[this.pos].lexeme);
+        break;
+      default:
+        console.log("ERROR: expecting epxression");
+    }
     while (
       this.tokens[this.pos + 1] &&
       this.tokens[this.pos + 1].type == "OPR"
     ) {
       let operator = this.tokens[this.pos + 1].lexeme;
 
-      let precedence;
-      if ((operator == "+") | (operator == "-")) precedence = 1;
-      if ((operator == "*") | (operator == "/")) precedence = 2;
+      let precedence = precedenceTable[operator];
 
-      if (!lastPrecedence || precedence > lastPrecedence) {
+      if (!lastPrecedence || precedence < lastPrecedence) {
         this.pos += 2;
         expression = {
           [opTable[operator]]: [expression, this.parseExpression(precedence)]

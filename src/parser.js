@@ -1,35 +1,22 @@
-// statement:
-//   keyword...
-//
-// expression:
-//   IDN | literal | grouping | operation | function
-//
-// literal:
-//   STR | NUM | "true" | "false"
-//
-// grouping:
-//   GRP:"(" expression GRP:")"
-//
-// operation:
-//   expression OPR expression
+// TODO:
+// generalize token consumption code
+// Handle parselet error reporting
+// Add block content search
+// better case-sensitive handling
+// complete opTable and precedenceTable
 
 let opTable = {
   "+": "ADD",
   "-": "SUB",
   "*": "MUL",
   "/": "DIV",
-  ":": "SET"
+  ":": "SET",
+  "=": "==",
+  "<": "<",
+  ">": ">"
 };
 
 let precedenceTable = {
-  // ASSIGNMENT: 1,
-  // CONDITIONAL: 2,
-  // SUM: 3,
-  // PRODUCT: 4,
-  // EXPONENT: 5,
-  // PREFIX: 6,
-  // POSTFIX: 7,
-  // CALL: 8
   ":": 0,
   "*": 1,
   "/": 1,
@@ -61,6 +48,10 @@ class Parser {
             break;
           case "LET":
             this.parseLet();
+            break;
+          case "IF":
+            this.parseIf();
+            break;
           default:
             console.error(`KEY NOT FOUND: "${token.lexeme}"`);
         }
@@ -73,6 +64,57 @@ class Parser {
     this.pos = 0;
 
     return this.program;
+  }
+
+  consume() {
+    this.pos++;
+    let token = this.tokens[this.pos];
+    return token;
+  }
+
+  findBlockContents(startLexeme, endLexeme, initialCount) {
+    let count = initialCount ? initialCount : 0;
+    let initialpos = this.pos + 1;
+
+    // TODO: if the start of the block wasn't consumed yet,
+    // we should loop through the code until we find one
+
+    // Keep looping until we find our closing key or we run out of tokens
+    while (count !== 0 && this.tokens[this.pos]) {
+      let token = this.consume();
+      if (token.type == "KEY") {
+        if (token.lexeme.toLowerCase() == startLexeme.toLowerCase()) count++;
+        if (token.lexeme.toLowerCase() == endLexeme.toLowerCase()) count--;
+      }
+    }
+    // console.log(this.tokens.slice(initialpos, this.pos), this.tokens[this.pos]);
+    return count == 0 ? this.tokens.slice(initialpos, this.pos) : null;
+  }
+
+  // If var = 1 then
+  //   print "hello world"
+  // elseif var = 2 then
+  //   print "hello poop"
+  // else
+  //   print "go away"
+  // endif
+  parseIf() {
+    this.consume();
+    let line = { IF: this.parseExpression() };
+    let token = this.consume();
+    if (token.type == "KEY" && token.lexeme.toLowerCase() == "then") {
+      let ifBody = this.findBlockContents("if", "endif", 1);
+      if (ifBody !== null) {
+        line.script = new Parser(ifBody).parse();
+        this.program.push(line);
+      } else {
+        console.error(`ERROR: expecting 'ENDIF'`);
+        return;
+      }
+    } else {
+      console.error(`ERROR: expected 'THEN', found '${token.lexeme}'`);
+      return;
+    }
   }
 
   parseLet() {
@@ -101,16 +143,9 @@ class Parser {
 
   parseRepeat() {
     this.pos++;
-    let line = {};
-    line = { REPEAT: this.parseExpression() };
+    let line = { REPEAT: this.parseExpression() };
+    let blockTokens = this.findBlockContents("repeat", "endrepeat", 1);
 
-    let endPos = this.pos++;
-    while (this.tokens[endPos].lexeme.toLowerCase() !== "endrepeat") {
-      // console.log(this.tokens[endPos].lexeme);
-      endPos++;
-    }
-    let blockTokens = this.tokens.slice(this.pos, endPos);
-    this.pos = endPos;
     line.script = new Parser(blockTokens).parse();
     this.program.push(line);
   }

@@ -1,16 +1,13 @@
-'print 7 / 11 - 16 / 17 + 0  ' -0.3048128342245989
-'print 13 * 16 + 7 / 12 + 2  ' 210.58333333333334
-'print 7 + 2 - 14 + 17 - 6   ' 6
-'print 14 + 6 + 12 + 9 / 9   ' 33
-'print 19 + 18 + 7 * 0 - 9   ' 28
-'print 5 - 5 + 10 / 0 + 1    ' Infinity
-'print 14 * 9 * 8 / 10 / 7   ' 14.4
-'print 0 - 18 + 9 * 2 / 6    ' -15
-'print 9 + 2 / 4 * 5 - 1     ' 10.5
-'print 7 / 10 * 5 * 6 - 17   ' 4
-
 i: 0
 repeat 10
   print i
   i: i+1
 endrepeat
+
+i:4
+if i<10 then
+  print "i is less than 10"
+  if i<5 then
+    print "i is less than 5"
+  endif
+endif

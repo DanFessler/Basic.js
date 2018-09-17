@@ -22,6 +22,7 @@
   "author": "Dan Fessler",
   "license": "MIT",
   "dependencies": {
+    "bason": "github:danfessler/bason",
     "npm-watch": "^0.3.0"
   }
 }

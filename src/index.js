@@ -1,6 +1,8 @@
 const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
-let bason = require("./bason");
+
+// referencing external repo for now, should use NPM package
+let bason = require("../../bason");
 
 module.exports = program => {
   program = Lexer(program);

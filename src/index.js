@@ -5,6 +5,10 @@ let bason = require("./bason");
 module.exports = program => {
   program = Lexer(program);
   program = Parser(program);
-  console.log(JSON.stringify(program, null, 1));
+  console.log(
+    "Program AST:",
+    "\n" + JSON.stringify(program, null, 1),
+    "\n\nResult:"
+  );
   bason.RUN(program);
 };

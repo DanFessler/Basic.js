@@ -59,6 +59,68 @@ let keywordParsers = {
       console.error(`ERROR: expected 'THEN', found '${token.lexeme}'`);
       return;
     }
+  },
+
+  WHILE: function() {
+    this.consumeToken();
+    let line = { WHILE: null, script: [[this.parseExpression()]] };
+    let blockTokens = this.findBlockContents("while", "endwhile", 1);
+    if (blockTokens) {
+      line.script.push(new Parser(blockTokens).parse());
+      this.program.push(line);
+    } else {
+      console.error(`ERROR: expected 'ENDWHILE'`);
+      return;
+    }
+  },
+
+  FOR: function() {
+    let token,
+      key,
+      start,
+      end,
+      step = 1;
+    token = this.consumeToken();
+    if (token.type == "IDN") {
+      key = token.lexeme;
+    } else {
+      console.error("ERROR: expecting variable name");
+      return;
+    }
+    token = this.consumeToken();
+    if (token.type !== "OPR" && token.lexeme !== "=") {
+      console.error("ERROR: expecting '=' operator");
+      return;
+    }
+    this.consumeToken();
+    start = this.parseExpression();
+    token = this.consumeToken();
+    if (token.type !== "KEY" && token.lexeme.toUpperCase() !== "TO") {
+      console.error("ERROR: expecting 'TO' keyword");
+      return;
+    }
+    this.consumeToken();
+    end = this.parseExpression();
+
+    token = this.tokens[this.pos + 1];
+    console.log(token);
+    if (token.type == "KEY" && token.lexeme.toUpperCase() == "STEP") {
+      this.consumeToken();
+      this.consumeToken();
+      step = this.parseExpression();
+    }
+
+    let blockTokens = this.findBlockContents("for", "endfor", 1);
+    if (blockTokens) {
+      let line = {
+        FOR: [key, start, end, step],
+        script: new Parser(blockTokens).parse()
+      };
+      this.program.push(line);
+    } else {
+      console.error(`ERROR: expected 'ENDFOR'`);
+      return;
+    }
   }
 };
 

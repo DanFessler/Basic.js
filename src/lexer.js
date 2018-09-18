@@ -5,7 +5,6 @@ const config = {
     { name: "SPC", pattern: /^\s+$/ },
     { name: "SEP", pattern: /^,$/ },
     { name: "GRP", pattern: /^(\(|\))$/ },
-    // { name: "RPR", pattern: /^\)$/ },
     {
       name: "STR",
       pattern: /^\"([\s\S]*?)"?$/,
@@ -19,12 +18,12 @@ const config = {
 
   // prettier-ignore
   keywords: [
-    "while",
-    "endwhile",
-    "for",
-    "to",
-    "step",
-    "endfor",
+    "while",      // ✓
+    "endwhile",   // ✓
+    "for",        // ✓
+    "to",         // ✓
+    "step",       // ✓
+    "endfor",     // ✓
     "if",         // ✓
     "then",       // ✓
     "elseif",

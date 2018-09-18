@@ -19,13 +19,12 @@ const config = {
   // prettier-ignore
   keywords: [
     "while",      // ✓
-    "endwhile",   // ✓
+    "wend",   // ✓
     "for",        // ✓
     "to",         // ✓
     "step",       // ✓
-    "endfor",     // ✓
+    "next",     // ✓
     "if",         // ✓
-    "then",       // ✓
     "elseif",
     "else",       // ✓
     "endif",      // ✓

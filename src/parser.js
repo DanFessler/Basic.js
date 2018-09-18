@@ -14,15 +14,22 @@ let opTable = {
   ":": "SET",
   "=": "==",
   "<": "<",
-  ">": ">"
+  ">": ">",
+  "<>": "<>",
+  "%": "MOD"
 };
 
 let precedenceTable = {
-  ":": 0,
   "*": 1,
   "/": 1,
+  "%": 1,
   "+": 2,
-  "-": 2
+  "-": 2,
+  "<": 3,
+  ">": 3,
+  "=": 4,
+  "<>": 4,
+  ":": 5
 };
 
 let keywordParsers = {
@@ -37,26 +44,20 @@ let keywordParsers = {
   IF: function() {
     this.consumeToken();
     let line = { IF: this.parseExpression() };
-    let token = this.consumeToken();
-    if (token.type == "KEY" && token.lexeme.toLowerCase() == "then") {
-      let ifBody = this.findBlockContents("if", ["else", "endif"], 1);
-      // let ifBody = this.findBlockContents("if", "endif", 1);
-      if (ifBody !== null) {
-        let elseBody;
-        if (this.tokens[this.pos].lexeme.toLowerCase() == "else") {
-          elseBody = this.findBlockContents("if", "endif", 1);
-        }
-        line.script = [
-          new Parser(ifBody).parse(),
-          elseBody ? new Parser(elseBody).parse() : null
-        ];
-        this.program.push(line);
-      } else {
-        console.error(`ERROR: expecting 'ENDIF'`);
-        return;
+    let ifBody = this.findBlockContents("if", ["elseif", "else", "endif"], 1);
+    // let ifBody = this.findBlockContents("if", "endif", 1);
+    if (ifBody !== null) {
+      let elseBody;
+      if (this.tokens[this.pos].lexeme.toLowerCase() == "else") {
+        elseBody = this.findBlockContents("if", "endif", 1);
       }
+      line.script = [
+        new Parser(ifBody).parse(),
+        elseBody ? new Parser(elseBody).parse() : null
+      ];
+      this.program.push(line);
     } else {
-      console.error(`ERROR: expected 'THEN', found '${token.lexeme}'`);
+      console.error(`ERROR: expecting 'ENDIF'`);
       return;
     }
   },
@@ -64,12 +65,12 @@ let keywordParsers = {
   WHILE: function() {
     this.consumeToken();
     let line = { WHILE: null, script: [[this.parseExpression()]] };
-    let blockTokens = this.findBlockContents("while", "endwhile", 1);
+    let blockTokens = this.findBlockContents("while", "wend", 1);
     if (blockTokens) {
       line.script.push(new Parser(blockTokens).parse());
       this.program.push(line);
     } else {
-      console.error(`ERROR: expected 'ENDWHILE'`);
+      console.error(`ERROR: expected 'WEND'`);
       return;
     }
   },
@@ -109,7 +110,7 @@ let keywordParsers = {
       step = this.parseExpression();
     }
 
-    let blockTokens = this.findBlockContents("for", "endfor", 1);
+    let blockTokens = this.findBlockContents("for", "next", 1);
     if (blockTokens) {
       let line = {
         FOR: [key, start, end, step],
@@ -117,7 +118,7 @@ let keywordParsers = {
       };
       this.program.push(line);
     } else {
-      console.error(`ERROR: expected 'ENDFOR'`);
+      console.error(`ERROR: expected 'NEXT'`);
       return;
     }
   }

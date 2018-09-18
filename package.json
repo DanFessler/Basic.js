@@ -5,17 +5,13 @@
   "main": "index.js",
   "watch": {
     "test": {
-      "patterns": [
-        "src",
-        "programs",
-        "index.js"
-      ],
+      "patterns": ["src", "programs", "index.js"],
       "extensions": "js,BAS",
       "quiet": "true"
     }
   },
   "scripts": {
-    "test": "node index.js ./programs/HelloWorld.BAS",
+    "test": "node index.js ./programs/FizzBuzz.BAS",
     "start": "node index.js",
     "watch": "npm-watch test"
   },

@@ -1,11 +1,15 @@
-for i: 1 to 100
-  if (i % 15) = 0
+for i = 1 to 100
+  if i % 15 = 0
     print "FizzBuzz"
-  else if (i % 5) = 0
-    print "Buzz"
-  else if (i % 3) = 0
-    print "Fizz"
   else
-    print i
+    if i % 5 = 0
+      print "Buzz"
+    else
+      if i % 3 = 0
+        print "Fizz"
+      else
+        print i
+      endif
+    endif
   endif
 next

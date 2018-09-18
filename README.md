@@ -6,36 +6,36 @@ This project is a work in progress and is not ready for production
 
 # keywords
 
-*   [x] While
-*   [x] Wend
-*   [x] For
-*   [x] To
-*   [x] Step
-*   [x] Next
-*   [x] If
-*   [ ] elseif
-*   [x] else
-*   [x] endif
-*   [ ] function
-*   [ ] endfunction
-*   [ ] return
-*   [x] print
+* [x] While
+* [x] Wend
+* [x] For
+* [x] To
+* [x] Step
+* [x] Next
+* [x] If
+* [ ] elseif
+* [x] else
+* [x] endif
+* [ ] function
+* [ ] endfunction
+* [ ] return
+* [x] print
 
 # Operators
 
-*   [x] "+" Add
-*   [x] "-" Subtract
-*   [x] "\*" Multiply
-*   [x] "/" Divide
-*   [x] ":" Assign
-*   [x] "=" Equality
-*   [x] "<" Less Than
-*   [x] ">" Greater Than
-*   [x] "<>" Not Equal
-*   [x] "%" Modulo
-*   [ ] "( )" groupings
-*   [ ] "AND"
-*   [ ] "OR"
+* [x] "+" Add
+* [x] "-" Subtract
+* [x] "\*" Multiply
+* [x] "/" Divide
+* [x] ":" Assign
+* [x] "=" Equality
+* [x] "<" Less Than
+* [x] ">" Greater Than
+* [x] "<>" Not Equal
+* [x] "%" Modulo
+* [x] "&" And
+* [x] "|" Or
+* [x] "( )" groupings
 
 # Example
 

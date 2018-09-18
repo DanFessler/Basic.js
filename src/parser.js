@@ -1,11 +1,3 @@
-// TODO:
-// generalize token consumption code
-// Handle parselet error reporting
-// Add block content search
-// better case-sensitive handling
-// complete opTable and precedenceTable
-// add parenthesis parsing to expressions
-
 let opTable = {
   "+": "ADD",
   "-": "SUB",
@@ -16,7 +8,9 @@ let opTable = {
   "<": "<",
   ">": ">",
   "<>": "<>",
-  "%": "MOD"
+  "%": "MOD",
+  "&": "AND",
+  "|": "OR"
 };
 
 let precedenceTable = {
@@ -29,7 +23,9 @@ let precedenceTable = {
   ">": 3,
   "=": 4,
   "<>": 4,
-  ":": 5
+  "&": 5,
+  "|": 6,
+  ":": 7
 };
 
 let keywordParsers = {
@@ -45,7 +41,7 @@ let keywordParsers = {
     this.consumeToken();
     let line = { IF: this.parseExpression() };
     let ifBody = this.findBlockContents("if", ["elseif", "else", "endif"], 1);
-    // let ifBody = this.findBlockContents("if", "endif", 1);
+
     if (ifBody !== null) {
       let elseBody;
       if (this.tokens[this.pos].lexeme.toLowerCase() == "else") {
@@ -170,30 +166,30 @@ class Parser {
     let lastEndLexeme = null;
     while (count !== 0 && this.tokens[this.pos + 1]) {
       let token = this.consumeToken();
-      if (token.type == "KEY") {
-        if (token.lexeme.toLowerCase() == startLexeme.toLowerCase()) {
-          let lastEndLexeme = null;
-          count++;
-        }
-        if (Array.isArray(endLexeme)) {
-          for (let i = 0; i < endLexeme.length; i++) {
-            if (token.lexeme.toLowerCase() == endLexeme[i].toLowerCase()) {
-              if (lastEndLexeme == null || i <= lastEndLexeme) {
-                lastEndLexeme = i;
-                count--;
-              }
+      // if (token.type == "KEY") {
+      if (token.lexeme.toLowerCase() == startLexeme.toLowerCase()) {
+        let lastEndLexeme = null;
+        count++;
+      }
+      if (Array.isArray(endLexeme)) {
+        for (let i = 0; i < endLexeme.length; i++) {
+          if (token.lexeme.toLowerCase() == endLexeme[i].toLowerCase()) {
+            if (lastEndLexeme == null || i <= lastEndLexeme) {
+              lastEndLexeme = i;
+              count--;
             }
           }
-        } else {
-          if (token.lexeme.toLowerCase() == endLexeme.toLowerCase()) count--;
         }
+      } else {
+        if (token.lexeme.toLowerCase() == endLexeme.toLowerCase()) count--;
       }
+      // }
     }
     return count == 0 ? this.tokens.slice(initialpos, this.pos) : null;
   }
 
   parseExpression(lastPrecedence) {
-    let expression = Number(this.tokens[this.pos].lexeme);
+    let expression;
     switch (this.tokens[this.pos].type) {
       case "IDN":
         if (
@@ -205,6 +201,14 @@ class Parser {
         break;
       case "NUM":
         expression = Number(this.tokens[this.pos].lexeme);
+        break;
+      case "GRP":
+        if (this.tokens[this.pos].lexeme == "(") {
+          let group = this.findBlockContents("(", ")", 1);
+          expression = new Parser(group).parse();
+        } else {
+          console.log("ERROR: expecting '('");
+        }
         break;
       default:
         console.log("ERROR: expecting epxression");

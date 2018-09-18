@@ -4,6 +4,7 @@
 // Add block content search
 // better case-sensitive handling
 // complete opTable and precedenceTable
+// add parenthesis parsing to expressions
 
 let opTable = {
   "+": "ADD",
@@ -24,92 +25,19 @@ let precedenceTable = {
   "-": 2
 };
 
-class Parser {
-  constructor(tokens) {
-    this.program = [];
-    this.pos = 0;
-    this.tokens = tokens;
-  }
+let keywordParsers = {
+  PRINT: function() {
+    let token = this.consumeToken();
+    let line = {
+      PRINT: token.type == "STR" ? token.lexeme : this.parseExpression()
+    };
+    this.program.push(line);
+  },
 
-  parse() {
-    let tokens = this.tokens;
-
-    while (this.pos < tokens.length) {
-      let token = tokens[this.pos];
-
-      // check for keyword
-      if (token.type == "KEY") {
-        switch (token.lexeme.toUpperCase()) {
-          case "PRINT":
-            this.parsePrint();
-            break;
-          case "REPEAT":
-            this.parseRepeat();
-            break;
-          case "LET":
-            this.parseLet();
-            break;
-          case "IF":
-            this.parseIf();
-            break;
-          default:
-            console.error(`KEY NOT FOUND: "${token.lexeme}"`);
-            return;
-        }
-      } else {
-        this.program.push(this.parseExpression());
-      }
-
-      this.pos++;
-    }
-    this.pos = 0;
-
-    return this.program;
-  }
-
-  consume() {
-    this.pos++;
-    let token = this.tokens[this.pos];
-    return token;
-  }
-
-  findBlockContents(startLexeme, endLexeme, initialCount) {
-    let count = initialCount ? initialCount : 0;
-    let initialpos = this.pos + 1;
-
-    // TODO: if the start of the block wasn't consumed yet,
-    // we should loop through the code until we find one
-
-    // Keep looping until we find our closing key or we run out of tokens
-    let lastEndLexeme = null;
-    while (count !== 0 && this.tokens[this.pos + 1]) {
-      let token = this.consume();
-      if (token.type == "KEY") {
-        if (token.lexeme.toLowerCase() == startLexeme.toLowerCase()) {
-          let lastEndLexeme = null;
-          count++;
-        }
-        if (Array.isArray(endLexeme)) {
-          for (let i = 0; i < endLexeme.length; i++) {
-            if (token.lexeme.toLowerCase() == endLexeme[i].toLowerCase()) {
-              if (lastEndLexeme == null || i <= lastEndLexeme) {
-                lastEndLexeme = i;
-                count--;
-              }
-            }
-          }
-        } else {
-          if (token.lexeme.toLowerCase() == endLexeme.toLowerCase()) count--;
-        }
-      }
-    }
-    return count == 0 ? this.tokens.slice(initialpos, this.pos) : null;
-  }
-
-  parseIf() {
-    this.consume();
+  IF: function() {
+    this.consumeToken();
     let line = { IF: this.parseExpression() };
-    let token = this.consume();
+    let token = this.consumeToken();
     if (token.type == "KEY" && token.lexeme.toLowerCase() == "then") {
       let ifBody = this.findBlockContents("if", ["else", "endif"], 1);
       // let ifBody = this.findBlockContents("if", "endif", 1);
@@ -132,38 +60,74 @@ class Parser {
       return;
     }
   }
+};
 
-  parseLet() {
-    this.pos++;
-    let name;
-    let token = this.tokens[this.pos];
-    if (token && token.type == "IDN") {
-      name = token.lexeme;
+class Parser {
+  constructor(tokens) {
+    this.program = [];
+    this.pos = 0;
+    this.tokens = tokens;
+    this.keywords = keywordParsers;
+  }
+
+  parse() {
+    let tokens = this.tokens;
+
+    while (this.pos < tokens.length) {
+      let token = tokens[this.pos];
+
+      // If it starts with a keyword, find its parser
+      let keywordParser = this.keywords[token.lexeme.toUpperCase()];
+      if (token.type == "KEY" && keywordParser) {
+        keywordParser.call(this);
+      } else {
+        // Otherwise try to parse it as an expression
+        this.program.push(this.parseExpression());
+      }
+
       this.pos++;
     }
-    let value = this.parseExpression();
-    this.program.push({ LET: [name, value] });
+
+    return this.program;
   }
 
-  parsePrint() {
+  consumeToken() {
     this.pos++;
-    let line = {};
     let token = this.tokens[this.pos];
-    if (token.type == "STR") {
-      line = { PRINT: token.lexeme };
-    } else {
-      line = { PRINT: this.parseExpression() };
-    }
-    this.program.push(line);
+    return token;
   }
 
-  parseRepeat() {
-    this.pos++;
-    let line = { REPEAT: this.parseExpression() };
-    let blockTokens = this.findBlockContents("repeat", "endrepeat", 1);
+  findBlockContents(startLexeme, endLexeme, initialCount) {
+    let count = initialCount ? initialCount : 0;
+    let initialpos = this.pos + 1;
 
-    line.script = new Parser(blockTokens).parse();
-    this.program.push(line);
+    // TODO: if the start of the block wasn't consumed yet,
+    // we should loop through the code until we find one
+
+    // Keep looping until we find our closing key or we run out of tokens
+    let lastEndLexeme = null;
+    while (count !== 0 && this.tokens[this.pos + 1]) {
+      let token = this.consumeToken();
+      if (token.type == "KEY") {
+        if (token.lexeme.toLowerCase() == startLexeme.toLowerCase()) {
+          let lastEndLexeme = null;
+          count++;
+        }
+        if (Array.isArray(endLexeme)) {
+          for (let i = 0; i < endLexeme.length; i++) {
+            if (token.lexeme.toLowerCase() == endLexeme[i].toLowerCase()) {
+              if (lastEndLexeme == null || i <= lastEndLexeme) {
+                lastEndLexeme = i;
+                count--;
+              }
+            }
+          }
+        } else {
+          if (token.lexeme.toLowerCase() == endLexeme.toLowerCase()) count--;
+        }
+      }
+    }
+    return count == 0 ? this.tokens.slice(initialpos, this.pos) : null;
   }
 
   parseExpression(lastPrecedence) {

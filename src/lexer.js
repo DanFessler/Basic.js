@@ -16,19 +16,24 @@ const config = {
     { name: "IDN", pattern: /^[a-zA-Z](\w+)?$/i },
     { name: "OPR", pattern: /^(:|\+|-|\*|\/|%|=|<>|>|<|>=|<=|&|\|)$/ }
   ],
+
+  // prettier-ignore
   keywords: [
+    "while",
+    "endwhile",
     "for",
     "to",
-    "next",
-    "if",
-    "then",
+    "step",
+    "endfor",
+    "if",         // ✓
+    "then",       // ✓
     "elseif",
-    "else",
-    "endif",
-    "print",
-    "repeat",
-    "endrepeat",
-    "let"
+    "else",       // ✓
+    "endif",      // ✓
+    "function",
+    "endfunction",
+    "return",
+    "print"       // ✓
   ],
   ignore: ["COM", "SPC", "END"]
 };

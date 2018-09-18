@@ -1,9 +1,3 @@
-i: 0
-repeat 10
-  print i
-  i: i+1
-endrepeat
-
 i:10
 
 if i<11 then

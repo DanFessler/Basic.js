@@ -1,6 +1,6 @@
 # jsbasic
 
-a BASIC interpreter written JavaScript, and uses the [BASON](danfessler/bason) runtime
+a BASIC interpreter written JavaScript, and uses the [BASON](https://github.com/DanFessler/bason) runtime
 
 This project is a work in progress and is not ready for production
 

@@ -89,14 +89,14 @@ let keywordParsers = {
       return;
     }
     token = this.consumeToken();
-    if (token.type !== "OPR" && token.lexeme !== "=") {
-      console.error("ERROR: expecting '=' operator");
+    if (!(token.type == "OPR" && token.lexeme == ":")) {
+      console.error("ERROR: expecting ':' operator");
       return;
     }
     this.consumeToken();
     start = this.parseExpression();
     token = this.consumeToken();
-    if (token.type !== "KEY" && token.lexeme.toUpperCase() !== "TO") {
+    if (!(token.type == "KEY" && token.lexeme.toUpperCase() == "TO")) {
       console.error("ERROR: expecting 'TO' keyword");
       return;
     }

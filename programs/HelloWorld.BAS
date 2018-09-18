@@ -19,6 +19,6 @@ while i<3
   i: i+1
 wend
 
-for i = 0 to 4 step 2
+for i: 0 to 4 step 2
   print i
 next

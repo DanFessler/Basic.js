@@ -1,4 +1,4 @@
-for i = 1 to 100
+for i: 1 to 100
   if i % 15 = 0
     print "FizzBuzz"
   else

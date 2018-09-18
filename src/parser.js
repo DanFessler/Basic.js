@@ -103,7 +103,6 @@ let keywordParsers = {
     end = this.parseExpression();
 
     token = this.tokens[this.pos + 1];
-    console.log(token);
     if (token.type == "KEY" && token.lexeme.toUpperCase() == "STEP") {
       this.consumeToken();
       this.consumeToken();

@@ -54,6 +54,7 @@ class Parser {
             break;
           default:
             console.error(`KEY NOT FOUND: "${token.lexeme}"`);
+            return;
         }
       } else {
         this.program.push(this.parseExpression());
@@ -80,32 +81,47 @@ class Parser {
     // we should loop through the code until we find one
 
     // Keep looping until we find our closing key or we run out of tokens
-    while (count !== 0 && this.tokens[this.pos]) {
+    let lastEndLexeme = null;
+    while (count !== 0 && this.tokens[this.pos + 1]) {
       let token = this.consume();
       if (token.type == "KEY") {
-        if (token.lexeme.toLowerCase() == startLexeme.toLowerCase()) count++;
-        if (token.lexeme.toLowerCase() == endLexeme.toLowerCase()) count--;
+        if (token.lexeme.toLowerCase() == startLexeme.toLowerCase()) {
+          let lastEndLexeme = null;
+          count++;
+        }
+        if (Array.isArray(endLexeme)) {
+          for (let i = 0; i < endLexeme.length; i++) {
+            if (token.lexeme.toLowerCase() == endLexeme[i].toLowerCase()) {
+              if (lastEndLexeme == null || i <= lastEndLexeme) {
+                lastEndLexeme = i;
+                count--;
+              }
+            }
+          }
+        } else {
+          if (token.lexeme.toLowerCase() == endLexeme.toLowerCase()) count--;
+        }
       }
     }
-    // console.log(this.tokens.slice(initialpos, this.pos), this.tokens[this.pos]);
     return count == 0 ? this.tokens.slice(initialpos, this.pos) : null;
   }
 
-  // If var = 1 then
-  //   print "hello world"
-  // elseif var = 2 then
-  //   print "hello poop"
-  // else
-  //   print "go away"
-  // endif
   parseIf() {
     this.consume();
     let line = { IF: this.parseExpression() };
     let token = this.consume();
     if (token.type == "KEY" && token.lexeme.toLowerCase() == "then") {
-      let ifBody = this.findBlockContents("if", "endif", 1);
+      let ifBody = this.findBlockContents("if", ["else", "endif"], 1);
+      // let ifBody = this.findBlockContents("if", "endif", 1);
       if (ifBody !== null) {
-        line.script = new Parser(ifBody).parse();
+        let elseBody;
+        if (this.tokens[this.pos].lexeme.toLowerCase() == "else") {
+          elseBody = this.findBlockContents("if", "endif", 1);
+        }
+        line.script = [
+          new Parser(ifBody).parse(),
+          elseBody ? new Parser(elseBody).parse() : null
+        ];
         this.program.push(line);
       } else {
         console.error(`ERROR: expecting 'ENDIF'`);

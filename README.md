@@ -45,16 +45,12 @@ below is an example implementation of Fizz Buzz
 for i: 1 to 100
   if i % 15 = 0
     print "FizzBuzz"
+  elseif i % 5 = 0
+    print "Buzz"
+  elseif i % 3 = 0
+    print "Fizz"
   else
-    if i % 5 = 0
-      print "Buzz"
-    else
-      if i % 3 = 0
-        print "Fizz"
-      else
-        print i
-      endif
-    endif
+    print i
   endif
 next
 ```

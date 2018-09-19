@@ -14,7 +14,7 @@ The core language is small and platform agnostic. As such, there are very few ke
 * [ ] object literals
 * [ ] library imports
 
-# keywords
+## keywords
 
 * While
 * Wend
@@ -31,7 +31,7 @@ The core language is small and platform agnostic. As such, there are very few ke
 * ~~return~~
 * print
 
-# Operators
+## Operators
 
 * \+
 * \-
@@ -47,7 +47,7 @@ The core language is small and platform agnostic. As such, there are very few ke
 * or, |
 * ( )
 
-# Example
+## Example
 
 below is an example implementation of Fizz Buzz
 
@@ -65,7 +65,7 @@ for i: 1 to 100
 next
 ```
 
-# Usage
+## Usage
 
 Running a .BAS file via command line:
 `node . [path-to/script.js]`

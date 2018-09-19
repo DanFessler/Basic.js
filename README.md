@@ -6,7 +6,7 @@ a BASIC interpreter written JavaScript, using the [BASON](https://github.com/Dan
 
 Basic.js is a transitional language for beginners before learning JavaScript. It keeps the friendly syntax of BASIC while introducing JavaScript-like concepts such as functions, and object literals.
 
-The core language is small and platform agnostic. As such, there are very few keywords to learn, instead, it relies on external JavaScript libraries for things i/o and graphics.
+The core language is small and platform agnostic. As such, there are very few keywords to learn, instead, it relies on external JavaScript libraries for things such as i/o and graphics.
 
 ### To Do:
 
@@ -28,9 +28,6 @@ The core language is small and platform agnostic. As such, there are very few ke
 * elseif
 * else
 * endif
-* ~~function~~
-* ~~endfunction~~
-* ~~return~~
 * print
 
 ## Operators

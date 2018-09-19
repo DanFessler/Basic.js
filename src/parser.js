@@ -49,7 +49,6 @@ let keywordParsers = {
       // which gets nested in each if's elsebody
       if (this.tokens[this.pos].lexeme.toLowerCase() == "elseif") {
         elseBody = this.keywords.IF.call(this);
-        console.log("elsebody: ", elseBody);
       }
 
       if (this.tokens[this.pos].lexeme.toLowerCase() == "else") {

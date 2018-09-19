@@ -8,7 +8,7 @@ Basic.js is a transitional language for beginners before learning JavaScript. It
 
 The core language is small and platform agnostic. As such, there are very few keywords to learn, instead, it relies on external JavaScript libraries for things i/o and graphics.
 
-## To Do:
+### To Do:
 
 * [ ] functions
 * [ ] object literals
@@ -33,8 +33,8 @@ The core language is small and platform agnostic. As such, there are very few ke
 
 # Operators
 
-* +
-* -
+* \+
+* \-
 * \*
 * /
 * :

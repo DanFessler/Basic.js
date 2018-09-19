@@ -11,7 +11,9 @@ The core language is small and platform agnostic. As such, there are very few ke
 ### To Do:
 
 * [ ] functions
-* [ ] object literals
+* [ ] objects
+* [ ] Arrays
+* [ ] Bool literals
 * [ ] library imports
 
 ## keywords

@@ -10,7 +10,9 @@ let opTable = {
   "<>": "<>",
   "%": "MOD",
   "&": "AND",
-  "|": "OR"
+  "|": "OR",
+  and: "AND",
+  or: "OR"
 };
 
 let precedenceTable = {
@@ -25,6 +27,8 @@ let precedenceTable = {
   "<>": 4,
   "&": 5,
   "|": 6,
+  and: 5,
+  or: 6,
   ":": 7
 };
 
@@ -222,7 +226,7 @@ class Parser {
       this.tokens[this.pos + 1] &&
       this.tokens[this.pos + 1].type == "OPR"
     ) {
-      let operator = this.tokens[this.pos + 1].lexeme;
+      let operator = this.tokens[this.pos + 1].lexeme.toLowerCase();
 
       let precedence = precedenceTable[operator];
 

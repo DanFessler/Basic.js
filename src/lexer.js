@@ -33,6 +33,9 @@ const config = {
     "return",
     "print"       // ✓
   ],
+
+  operators: ["and", "or"],
+
   ignore: ["COM", "SPC", "END"]
 };
 
@@ -45,6 +48,7 @@ class Lexer {
     this.rules = rules.rules;
     this.ignore = rules.ignore;
     this.keywords = rules.keywords;
+    this.operators = rules.operators;
   }
 
   tokenize(string) {
@@ -99,6 +103,15 @@ class Lexer {
                 this.keywords[key].toLowerCase()
               )
                 thisTok.type = "KEY";
+            }
+
+            // if token is a reserved operator, change the type
+            for (let op in this.operators) {
+              if (
+                thisTok.lexeme.toLowerCase() ===
+                this.operators[op].toLowerCase()
+              )
+                thisTok.type = "OPR";
             }
 
             // if the rule has a capture group, use it to generate final token

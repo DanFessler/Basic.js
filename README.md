@@ -1,41 +1,51 @@
-# jsbasic
+_This project is a work in progress and is not ready for production_
 
-a BASIC interpreter written JavaScript, and uses the [BASON](https://github.com/DanFessler/bason) runtime
+# Basic.js
 
-This project is a work in progress and is not ready for production
+a BASIC interpreter written JavaScript, and uses the [BASON](https://github.com/DanFessler/bason) runtime.
+
+Basic.js is a transitional language for beginners before learning JavaScript. It keeps the friendly syntax of BASIC while introducing JavaScript-like concepts such as functions, and object literals.
+
+The core language is small and platform agnostic. As such, there are very few keywords to learn, instead, it relies on external JavaScript libraries for things i/o and graphics.
+
+## To Do:
+
+* [ ] functions
+* [ ] object literals
+* [ ] library imports
 
 # keywords
 
-* [x] While
-* [x] Wend
-* [x] For
-* [x] To
-* [x] Step
-* [x] Next
-* [x] If
-* [x] elseif
-* [x] else
-* [x] endif
-* [ ] function
-* [ ] endfunction
-* [ ] return
-* [x] print
+* While
+* Wend
+* For
+* To
+* Step
+* Next
+* If
+* elseif
+* else
+* endif
+* ~~function~~
+* ~~endfunction~~
+* ~~return~~
+* print
 
 # Operators
 
-* [x] "+" Add
-* [x] "-" Subtract
-* [x] "\*" Multiply
-* [x] "/" Divide
-* [x] ":" Assign
-* [x] "=" Equality
-* [x] "<" Less Than
-* [x] ">" Greater Than
-* [x] "<>" Not Equal
-* [x] "%" Modulo
-* [x] "&" And
-* [x] "|" Or
-* [x] "( )" groupings
+* +
+* -
+* \*
+* /
+* :
+* =
+* <
+* \>
+* <>
+* %
+* and, &
+* or, |
+* ( )
 
 # Example
 

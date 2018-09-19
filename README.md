@@ -13,7 +13,7 @@ This project is a work in progress and is not ready for production
 * [x] Step
 * [x] Next
 * [x] If
-* [ ] elseif
+* [x] elseif
 * [x] else
 * [x] endif
 * [ ] function

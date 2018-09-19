@@ -34,7 +34,7 @@ let keywordParsers = {
     let line = {
       PRINT: token.type == "STR" ? token.lexeme : this.parseExpression()
     };
-    this.program.push(line);
+    return line;
   },
 
   IF: function() {
@@ -44,14 +44,20 @@ let keywordParsers = {
 
     if (ifBody !== null) {
       let elseBody;
-      if (this.tokens[this.pos].lexeme.toLowerCase() == "else") {
-        elseBody = this.findBlockContents("if", "endif", 1);
+
+      // recursively call if parser for each elseif statement
+      // which gets nested in each if's elsebody
+      if (this.tokens[this.pos].lexeme.toLowerCase() == "elseif") {
+        elseBody = this.keywords.IF.call(this);
+        console.log("elsebody: ", elseBody);
       }
-      line.script = [
-        new Parser(ifBody).parse(),
-        elseBody ? new Parser(elseBody).parse() : null
-      ];
-      this.program.push(line);
+
+      if (this.tokens[this.pos].lexeme.toLowerCase() == "else") {
+        elseBody = new Parser(this.findBlockContents("if", "endif", 1)).parse();
+      }
+
+      line.script = [new Parser(ifBody).parse(), elseBody ? elseBody : null];
+      return line;
     } else {
       console.error(`ERROR: expecting 'ENDIF'`);
       return;
@@ -64,7 +70,7 @@ let keywordParsers = {
     let blockTokens = this.findBlockContents("while", "wend", 1);
     if (blockTokens) {
       line.script.push(new Parser(blockTokens).parse());
-      this.program.push(line);
+      return line;
     } else {
       console.error(`ERROR: expected 'WEND'`);
       return;
@@ -112,7 +118,7 @@ let keywordParsers = {
         FOR: [key, start, end, step],
         script: new Parser(blockTokens).parse()
       };
-      this.program.push(line);
+      return line;
     } else {
       console.error(`ERROR: expected 'NEXT'`);
       return;
@@ -137,7 +143,7 @@ class Parser {
       // If it starts with a keyword, find its parser
       let keywordParser = this.keywords[token.lexeme.toUpperCase()];
       if (token.type == "KEY" && keywordParser) {
-        keywordParser.call(this);
+        this.program.push(keywordParser.call(this));
       } else {
         // Otherwise try to parse it as an expression
         this.program.push(this.parseExpression());

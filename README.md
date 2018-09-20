@@ -10,41 +10,40 @@ The core language is small and platform agnostic. As such, there are very few ke
 
 ### To Do:
 
-* [ ] functions
-* [ ] objects
-* [ ] Arrays
-* [ ] Bool literals
-* [ ] library imports
+- [ ] functions
+- [ ] objects
+- [ ] Arrays
+- [ ] Bool literals
+- [ ] library imports
 
 ## keywords
 
-* While
-* Wend
-* For
-* To
-* Step
-* Next
-* If
-* elseif
-* else
-* endif
-* print
+- While
+- Wend
+- For
+- To
+- Step
+- Next
+- If
+- elseif
+- else
+- endif
+- print
 
 ## Operators
 
-* \+
-* \-
-* \*
-* /
-* :
-* =
-* <
-* \>
-* <>
-* %
-* and, &
-* or, |
-* ( )
+- \+
+- \-
+- \*
+- /
+- :
+- =
+- <
+- \>
+- <>
+- %
+- and
+- or
 
 ## Example
 

@@ -1,11 +1,11 @@
-For i: 1 to 100
-  If i % 15 = 0
+for i: 1 to 100
+  if i % 15 = 0
     Print "FizzBuzz"
-  ElseIf i % 5 = 0
+  elseif i % 5 = 0
     Print "Buzz"
-  ElseIf i % 3 = 0
+  elseif i % 3 = 0
     Print "Fizz"
-  Else
+  else
     print i
-  EndIf
-Next
+  endif
+next

@@ -13,7 +13,7 @@ const config = {
     },
     { name: "NUM", pattern: /^[0-9]+\.?([0-9]+)?$/ },
     { name: "IDN", pattern: /^[a-zA-Z](\w+)?$/i },
-    { name: "OPR", pattern: /^(:|\+|-|\*|\/|%|=|<>|>|<|>=|<=|&|\|)$/ }
+    { name: "OPR", pattern: /^(:|\+|-|\*|\/|%|=|<>|>|<|>=|<=)$/ }
   ],
 
   // prettier-ignore

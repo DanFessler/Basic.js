@@ -16,22 +16,21 @@ const config = {
     { name: "OPR", pattern: /^(:|\+|-|\*|\/|%|=|<>|>|<|>=|<=)$/ }
   ],
 
-  // prettier-ignore
   keywords: [
-    "while",      // ✓
-    "wend",       // ✓
-    "for",        // ✓
-    "to",         // ✓
-    "step",       // ✓
-    "next",       // ✓
-    "if",         // ✓
+    "while",
+    "wend",
+    "for",
+    "to",
+    "step",
+    "next",
+    "if",
     "elseif",
-    "else",       // ✓
-    "endif",      // ✓
+    "else",
+    "endif",
+    "print",
     "function",
     "endfunction",
-    "return",
-    "print"       // ✓
+    "return"
   ],
 
   operators: ["and", "or"],

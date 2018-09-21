@@ -122,6 +122,43 @@ let keywordParsers = {
       console.error(`ERROR: expected 'NEXT'`);
       return;
     }
+  },
+
+  FUNCTION: function() {
+    let token,
+      name,
+      params = [];
+
+    name = this.consumeToken();
+    if (name.type !== "IDN") return console.log("ERROR: Expecting identifier");
+
+    token = this.consumeToken();
+    if (!(token.type == "GRP" && token.lexeme == "("))
+      return console.log("ERROR: Expecting '('");
+
+    do {
+      token = this.consumeToken();
+      if (token.type == "IDN") {
+        params.push(token.lexeme);
+        token = this.consumeToken();
+      } else if (!(token.type == "GRP" && token.lexeme == ")")) {
+        return console.log("ERROR: Expecting identifier");
+      }
+    } while (token.type == "SEP");
+
+    if (!(token.type == "GRP" && token.lexeme == ")"))
+      return console.log("ERROR: Expecting ')'");
+
+    let functionBody = this.findBlockContents("function", "endfunction", 1);
+    if (functionBody) {
+      return {
+        FUNCTION: [name.lexeme, ...params],
+        script: new Parser(functionBody).parse()
+      };
+    } else {
+      console.error(`ERROR: expected 'ENDFUNCTION'`);
+      return;
+    }
   }
 };
 
@@ -141,8 +178,12 @@ class Parser {
 
       // If it starts with a keyword, find its parser
       let keywordParser = this.keywords[token.lexeme.toUpperCase()];
-      if (token.type == "KEY" && keywordParser) {
-        this.program.push(keywordParser.call(this));
+      if (token.type == "KEY") {
+        if (keywordParser) {
+          this.program.push(keywordParser.call(this));
+        } else {
+          console.log(`ERROR: Unrecognized keyword '${token.lexeme}'`);
+        }
       } else {
         // Otherwise try to parse it as an expression
         this.program.push(this.parseExpression());
@@ -216,7 +257,7 @@ class Parser {
         }
         break;
       default:
-        console.log("ERROR: expecting epxression");
+        console.log("ERROR: expecting expression");
     }
     while (
       this.tokens[this.pos + 1] &&

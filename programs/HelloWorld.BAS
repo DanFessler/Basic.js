@@ -7,3 +7,10 @@ if i=1 and a=1
 else
   print "cheese"
 endif
+
+function cheese(poop)
+  print poop
+  print "haha"
+endfunction
+
+cheese

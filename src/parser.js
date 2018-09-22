@@ -150,6 +150,8 @@ let keywordParsers = {
       return console.log("ERROR: Expecting ')'");
 
     let functionBody = this.findBlockContents("function", "endfunction", 1);
+    console.log(functionBody);
+    console.log(new Parser(functionBody).parse());
     if (functionBody) {
       return {
         FUNCTION: [name.lexeme, ...params],
@@ -234,19 +236,49 @@ class Parser {
     return count == 0 ? this.tokens.slice(initialpos, this.pos) : null;
   }
 
+  parseParams() {
+    let params = [];
+    if (this.tokens[this.pos].lexeme !== ")") {
+      do {
+        this.pos += 2;
+        let param = this.parseExpression();
+        params.push(param);
+      } while (this.tokens[this.pos + 1].type == "SEP");
+    }
+    if (
+      !(
+        this.tokens[this.pos + 1].type == "GRP" &&
+        this.tokens[this.pos + 1].lexeme == ")"
+      )
+    )
+      return console.log("ERROR: Expecting ')'");
+    else {
+      this.pos += 2;
+      return params;
+    }
+    console.log(params);
+    return params;
+  }
+
   parseExpression(lastPrecedence) {
     let expression;
     switch (this.tokens[this.pos].type) {
       case "IDN":
-        if (
-          this.tokens[this.pos + 1] &&
-          this.tokens[this.pos + 1].lexeme == ":"
-        )
-          expression = this.tokens[this.pos].lexeme;
-        else expression = { [this.tokens[this.pos].lexeme]: null };
+        let nextTok = this.tokens[this.pos + 1];
+        if (nextTok && (nextTok.lexeme == ":" || nextTok.lexeme == "(")) {
+          if (this.tokens[this.pos + 1].lexeme == ":") {
+            expression = this.tokens[this.pos].lexeme;
+          }
+          if (this.tokens[this.pos + 1].lexeme == "(") {
+            expression = { [this.tokens[this.pos].lexeme]: this.parseParams() };
+          }
+        } else expression = { [this.tokens[this.pos].lexeme]: null };
         break;
       case "NUM":
         expression = Number(this.tokens[this.pos].lexeme);
+        break;
+      case "STR":
+        expression = this.tokens[this.pos].lexeme;
         break;
       case "GRP":
         if (this.tokens[this.pos].lexeme == "(") {
@@ -257,7 +289,7 @@ class Parser {
         }
         break;
       default:
-        console.log("ERROR: expecting expression");
+        return console.log("ERROR: expecting expression");
     }
     while (
       this.tokens[this.pos + 1] &&

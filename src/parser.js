@@ -150,8 +150,7 @@ let keywordParsers = {
       return console.log("ERROR: Expecting ')'");
 
     let functionBody = this.findBlockContents("function", "endfunction", 1);
-    console.log(functionBody);
-    console.log(new Parser(functionBody).parse());
+
     if (functionBody) {
       return {
         FUNCTION: [name.lexeme, ...params],
@@ -209,7 +208,7 @@ class Parser {
       ) {
         return token;
       } else {
-        console.log(`ERROR: expected '${expectedToken.lexeme}'`);
+        console.error(`ERROR: expected '${expectedToken.lexeme}'`);
         return null;
       }
     } else return token;

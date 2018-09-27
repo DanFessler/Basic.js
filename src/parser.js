@@ -182,7 +182,9 @@ class Parser {
       let keywordParser = this.keywords[token.lexeme.toUpperCase()];
       if (token.type == "KEY") {
         if (keywordParser) {
-          this.program.push(keywordParser.call(this));
+          if (token.lexeme.toUpperCase() == "FUNCTION") {
+            this.program.unshift(keywordParser.call(this));
+          } else this.program.push(keywordParser.call(this));
         } else {
           console.log(`ERROR: Unrecognized keyword '${token.lexeme}'`);
         }
@@ -197,10 +199,20 @@ class Parser {
     return this.program;
   }
 
-  consumeToken() {
+  consumeToken(expectedToken) {
     this.pos++;
     let token = this.tokens[this.pos];
-    return token;
+    if (expectedToken !== undefined) {
+      if (
+        token.type == expectedToken.type &&
+        token.lexeme == expectedToken.lexeme
+      ) {
+        return token;
+      } else {
+        console.log(`ERROR: expected '${expectedToken.lexeme}'`);
+        return null;
+      }
+    } else return token;
   }
 
   findBlockContents(startLexeme, endLexeme, initialCount) {
@@ -237,26 +249,26 @@ class Parser {
   }
 
   parseParams() {
+    // when we begin parsing, we already looked ahead to match the opening parantheses, so advance
+    this.pos = this.pos + 2;
+
     let params = [];
-    if (this.tokens[this.pos].lexeme !== ")") {
-      do {
-        this.pos += 2;
-        let param = this.parseExpression();
-        params.push(param);
-      } while (this.tokens[this.pos + 1].type == "SEP");
-    }
-    if (
+
+    while (
+      this.tokens[this.pos + 1] &&
       !(
         this.tokens[this.pos + 1].type == "GRP" &&
         this.tokens[this.pos + 1].lexeme == ")"
       )
-    )
-      return console.log("ERROR: Expecting ')'");
-    else {
-      this.pos += 2;
-      return params;
+    ) {
+      params.push(this.parseExpression());
+      if (this.consumeToken({ type: "SEP", lexeme: "," }) === null) return null;
+      this.pos++;
     }
-    console.log(params);
+    // we ran into the end of the params, so lets manually parse the last one
+    params.push(this.parseExpression());
+
+    this.pos++;
     return params;
   }
 

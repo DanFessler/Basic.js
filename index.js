@@ -1,4 +1,5 @@
 const BASIC = require("./src");
+BASIC.import(require("./plugins/testPlugin"));
 
 // Make sure we got a filename on the command line.
 if (process.argv.length < 3) {
@@ -11,5 +12,5 @@ let filename = process.argv[2];
 
 fs.readFile(filename, "utf8", function(err, data) {
   if (err) throw err;
-  BASIC(data);
+  BASIC.run(data);
 });

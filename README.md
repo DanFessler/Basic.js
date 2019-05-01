@@ -2,7 +2,7 @@ _This project is a work in progress and is not ready for production_
 
 # Basic.js
 
-a [BASIC](https://en.wikipedia.org/wiki/BASIC) interpreter written in JavaScript, using the [BASON](https://github.com/DanFessler/bason) runtime.
+a [BASIC](https://en.wikipedia.org/wiki/BASIC) interpreter written in JavaScript, using the [BASIN](https://github.com/DanFessler/basin) runtime.
 
 Basic.js is a transitional language for beginners before learning JavaScript. It keeps the friendly syntax of BASIC, removing archaic ideas like line numbers and labels, while introducing JavaScript-like concepts such as functions and objects.
 

@@ -1,6 +1,6 @@
 const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
-let bason = require("bason");
+let basin = require("basin-script");
 
 module.exports = program => {
   program = Lexer(program);
@@ -10,5 +10,5 @@ module.exports = program => {
     "\n" + JSON.stringify(program, null, 1),
     "\n\nResult:"
   );
-  bason.RUN(program);
+  basin.run(program);
 };

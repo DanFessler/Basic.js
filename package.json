@@ -17,12 +17,10 @@
   "scripts": {
     "test": "node index.js ./programs/Function.BAS",
     "start": "node index.js",
-    "watch": "npm-watch test"
   },
   "author": "Dan Fessler",
   "license": "MIT",
   "dependencies": {
-    "bason": "github:danfessler/bason",
-    "npm-watch": "^0.3.0"
+    "basin-script": "github:danfessler/basin"
   }
 }

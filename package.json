@@ -2,18 +2,7 @@
   "name": "jsbasic",
   "version": "1.0.0",
   "description": "A BASIC interpreter written in JavaScript",
-  "main": "index.js",
-  "watch": {
-    "test": {
-      "patterns": [
-        "src",
-        "programs",
-        "index.js"
-      ],
-      "extensions": "js,BAS",
-      "quiet": "true"
-    }
-  },
+  "main": "./src/index.js",
   "scripts": {
     "test": "node index.js ./programs/Function.BAS",
     "start": "node index.js"

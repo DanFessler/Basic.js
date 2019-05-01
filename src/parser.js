@@ -160,6 +160,14 @@ let keywordParsers = {
       console.error(`ERROR: expected 'ENDFUNCTION'`);
       return;
     }
+  },
+
+  RETURN: function() {
+    let token = this.consumeToken();
+    let line = {
+      RETURN: this.parseExpression()
+    };
+    return line;
   }
 };
 

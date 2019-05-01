@@ -2,8 +2,7 @@ function isEven(num)
     if num = 0
         return "true"
     else
-        num: num - 1
-        return isOdd(num)
+        return isOdd(num - 1)
     endif
 endfunction
 
@@ -11,8 +10,7 @@ function isOdd(num)
     if num = 0
         return "false"
     else
-        num: num - 1
-        return isEven(num)
+        return isEven(num - 1)
     endif
 endfunction
 

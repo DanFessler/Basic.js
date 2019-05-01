@@ -206,7 +206,7 @@ class Parser {
     return this.program;
   }
 
-  consumeToken(expectedToken) {
+  consumeToken(expectedToken, suppressLog) {
     this.pos++;
     let token = this.tokens[this.pos];
     if (expectedToken !== undefined) {
@@ -216,7 +216,8 @@ class Parser {
       ) {
         return token;
       } else {
-        console.error(`ERROR: expected '${expectedToken.lexeme}'`);
+        if (!suppressLog)
+          console.error(`ERROR: expected '${expectedToken.lexeme}'`);
         return null;
       }
     } else return token;
@@ -259,6 +260,15 @@ class Parser {
     // when we begin parsing, we already looked ahead to match the opening parantheses, so advance
     this.pos = this.pos + 2;
 
+    // return null if there were no params
+    if (
+      this.tokens[this.pos].type == "GRP" &&
+      this.tokens[this.pos].lexeme == ")"
+    ) {
+      this.pos++;
+      return null;
+    }
+
     let params = [];
 
     while (
@@ -269,7 +279,9 @@ class Parser {
       )
     ) {
       params.push(this.parseExpression());
-      if (this.consumeToken({ type: "SEP", lexeme: "," }) === null) return null;
+      if (this.consumeToken({ type: "SEP", lexeme: "," }, true) === null) {
+        return params;
+      }
       this.pos++;
     }
     // we ran into the end of the params, so lets manually parse the last one

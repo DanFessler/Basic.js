@@ -1,6 +1,7 @@
 const Lexer = require("./lexer.js");
 const Parser = require("./parser.js");
 let basin = require("basin-script");
+basin.import(require("../plugins/testPlugin"));
 
 module.exports = (program, debug) => {
   program = Lexer(program);

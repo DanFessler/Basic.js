@@ -17,3 +17,4 @@ endfunction
 testNum: 123
 print testNum + " is even? " + isEven(testNum)
 print testNum + " is odd? " + isOdd(testNum)
+shapoopie()

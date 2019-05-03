@@ -30,7 +30,9 @@ const config = {
     "print",
     "function",
     "endfunction",
-    "return"
+    "return",
+    "update",
+    "endupdate"
   ],
 
   operators: ["and", "or"],

@@ -71,7 +71,7 @@ let keywordParsers = {
     return { RESUMEUPDATE: null };
   },
 
-  UPDATE: function*() {
+  UPDATE: function() {
     return { UPDATE: null };
   },
 

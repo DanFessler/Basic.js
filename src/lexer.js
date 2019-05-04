@@ -31,8 +31,8 @@ const config = {
     "function",
     "endfunction",
     "return",
-    "update",
-    "endupdate"
+    "suspendupdate",
+    "resumeupdate"
   ],
 
   operators: ["and", "or"],

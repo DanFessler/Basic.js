@@ -63,17 +63,14 @@ let keywordParsers = {
     }
   },
 
-  UPDATE: function() {
-    // this.consumeToken();
-    let line = { UPDATE: null, script: null };
-    let blockTokens = this.findBlockContents("update", "endupdate", 1);
-    if (blockTokens) {
-      line.script = new Parser(blockTokens).parse();
-      return line;
-    } else {
-      console.error(`ERROR: expected 'ENDUPDATE'`);
-      return;
-    }
+  SUSPENDUPDATE: function() {
+    this.consumeToken();
+    return { SUSPENDUPDATE: null };
+  },
+
+  RESUMEUPDATE: function() {
+    this.consumeToken();
+    return { RESUMEUPDATE: null };
   },
 
   WHILE: function() {

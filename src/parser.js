@@ -64,13 +64,15 @@ let keywordParsers = {
   },
 
   SUSPENDUPDATE: function() {
-    this.consumeToken();
     return { SUSPENDUPDATE: null };
   },
 
   RESUMEUPDATE: function() {
-    this.consumeToken();
     return { RESUMEUPDATE: null };
+  },
+
+  UPDATE: function*() {
+    return { UPDATE: null };
   },
 
   WHILE: function() {

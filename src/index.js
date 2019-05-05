@@ -12,7 +12,7 @@ module.exports = {
         "\n" + JSON.stringify(program, null, 1),
         "\n\nResult:"
       );
-    basin.run(program, delay, true);
+    basin.start(program, delay);
   },
   stop: () => {
     basin.stop();

@@ -29,6 +29,7 @@ let precedenceTable = {
 };
 
 let keywordParsers = {
+  // PRINT <EXP>
   PRINT: function() {
     let token = this.consumeToken();
     let line = {
@@ -37,6 +38,7 @@ let keywordParsers = {
     return line;
   },
 
+  // IF <EXP> <SCRIPT> ([ELSEIF <EXP> <SCRIPT>]) (ELSE <SCRIPT>) ENDIF
   IF: function() {
     this.consumeToken();
     let line = { IF: this.parseExpression() };
@@ -63,18 +65,22 @@ let keywordParsers = {
     }
   },
 
+  // SUSPENDUPDATE
   SUSPENDUPDATE: function() {
     return { SUSPENDUPDATE: null };
   },
 
+  // RESUMEUPDATE
   RESUMEUPDATE: function() {
     return { RESUMEUPDATE: null };
   },
 
+  // UPDATE
   UPDATE: function() {
     return { UPDATE: null };
   },
 
+  // WHILE <EXP> <SCRIPT> WEND
   WHILE: function() {
     this.consumeToken();
     let line = { WHILE: null, script: [[this.parseExpression()]] };
@@ -88,6 +94,7 @@ let keywordParsers = {
     }
   },
 
+  // FOR {IDN} {OPR:":"} <EXP> TO <EXP> (STEP <EXP>) <SCRIPT> NEXT
   FOR: function() {
     let token,
       key,
@@ -136,6 +143,7 @@ let keywordParsers = {
     }
   },
 
+  // FUNCTION {IDN} {GRP:"("} [{IDN} {SEP:","}] ({IDN}) {GRP:")"} <SCRIPT> ENDFUNCTION
   FUNCTION: function() {
     let token,
       name,
@@ -174,6 +182,7 @@ let keywordParsers = {
     }
   },
 
+  // RETURN <EXP>
   RETURN: function() {
     let token = this.consumeToken();
     let line = {
@@ -182,6 +191,7 @@ let keywordParsers = {
     return line;
   },
 
+  // SLEEP <EXP>
   SLEEP: function() {
     let token = this.consumeToken();
     let line = {

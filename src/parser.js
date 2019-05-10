@@ -180,6 +180,14 @@ let keywordParsers = {
       RETURN: this.parseExpression()
     };
     return line;
+  },
+
+  SLEEP: function() {
+    let token = this.consumeToken();
+    let line = {
+      SLEEP: this.parseExpression()
+    };
+    return line;
   }
 };
 
@@ -319,6 +327,9 @@ class Parser {
         break;
       case "NUM":
         expression = Number(this.tokens[this.pos].lexeme);
+        break;
+      case "BOOL":
+        expression = this.tokens[this.pos].lexeme == "true";
         break;
       case "STR":
         expression = this.tokens[this.pos].lexeme;

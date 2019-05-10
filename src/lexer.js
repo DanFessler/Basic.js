@@ -33,10 +33,13 @@ const config = {
     "return",
     "suspendupdate",
     "resumeupdate",
-    "update"
+    "update",
+    "sleep"
   ],
 
   operators: ["and", "or"],
+
+  bools: ["true", "false"],
 
   ignore: ["COM", "SPC", "END"]
 };
@@ -51,6 +54,7 @@ class Lexer {
     this.ignore = rules.ignore;
     this.keywords = rules.keywords;
     this.operators = rules.operators;
+    this.bools = rules.bools;
   }
 
   tokenize(string) {
@@ -114,6 +118,14 @@ class Lexer {
                 this.operators[op].toLowerCase()
               )
                 thisTok.type = "OPR";
+            }
+
+            // if token is a reserved bool, change the type
+            for (let key in this.bools) {
+              if (
+                thisTok.lexeme.toLowerCase() === this.bools[key].toLowerCase()
+              )
+                thisTok.type = "BOOL";
             }
 
             // if the rule has a capture group, use it to generate final token

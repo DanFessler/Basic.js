@@ -339,7 +339,7 @@ class Parser {
         expression = Number(this.tokens[this.pos].lexeme);
         break;
       case "BOOL":
-        expression = this.tokens[this.pos].lexeme == "true";
+        expression = this.tokens[this.pos].lexeme.toLowerCase() == "true";
         break;
       case "STR":
         expression = this.tokens[this.pos].lexeme;

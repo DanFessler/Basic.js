@@ -39,9 +39,7 @@ const config = {
 
   operators: ["and", "or"],
 
-  bools: ["true", "false"],
-
-  ignore: ["COM", "SPC", "END"]
+  bools: ["true", "false"]
 };
 
 class Lexer {
@@ -51,7 +49,6 @@ class Lexer {
     this.pos = 0;
     this.tokens = [];
     this.rules = rules.rules;
-    this.ignore = rules.ignore;
     this.keywords = rules.keywords;
     this.operators = rules.operators;
     this.bools = rules.bools;
@@ -100,41 +97,36 @@ class Lexer {
             }
           }
 
-          // Push finished token to the stack
-          if (this.ignore.indexOf(thisTok.type) === -1) {
-            // if token is a reserved keyword, change the type
-            for (let key in this.keywords) {
-              if (
-                thisTok.lexeme.toLowerCase() ===
-                this.keywords[key].toLowerCase()
-              )
-                thisTok.type = "KEY";
-            }
+          // Now lets push finished token to the stack...
 
-            // if token is a reserved operator, change the type
-            for (let op in this.operators) {
-              if (
-                thisTok.lexeme.toLowerCase() ===
-                this.operators[op].toLowerCase()
-              )
-                thisTok.type = "OPR";
-            }
-
-            // if token is a reserved bool, change the type
-            for (let key in this.bools) {
-              if (
-                thisTok.lexeme.toLowerCase() === this.bools[key].toLowerCase()
-              )
-                thisTok.type = "BOOL";
-            }
-
-            // if the rule has a capture group, use it to generate final token
-            thisTok.lexeme = token.capture
-              ? thisTok.lexeme.match(token.pattern)[token.capture]
-              : thisTok.lexeme;
-
-            this.tokens.push(thisTok);
+          // if token is a reserved keyword, change the type
+          for (let key in this.keywords) {
+            if (
+              thisTok.lexeme.toLowerCase() === this.keywords[key].toLowerCase()
+            )
+              thisTok.type = "KEY";
           }
+
+          // if token is a reserved operator, change the type
+          for (let op in this.operators) {
+            if (
+              thisTok.lexeme.toLowerCase() === this.operators[op].toLowerCase()
+            )
+              thisTok.type = "OPR";
+          }
+
+          // if token is a reserved bool, change the type
+          for (let key in this.bools) {
+            if (thisTok.lexeme.toLowerCase() === this.bools[key].toLowerCase())
+              thisTok.type = "BOOL";
+          }
+
+          // if the rule has a capture group, use it to generate final token
+          thisTok.lexeme = token.capture
+            ? thisTok.lexeme.match(token.pattern)[token.capture]
+            : thisTok.lexeme;
+
+          this.tokens.push(thisTok);
           break; // prevent applying additional rules
         }
       }

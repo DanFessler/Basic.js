@@ -29,6 +29,29 @@ let precedenceTable = {
 };
 
 let keywordParsers = {
+  // LET {IDN} {OPR:":"} <EXP>
+  LET: function() {
+    let token, key, value;
+    token = this.consumeToken();
+    if (token.type == "IDN") {
+      key = token.lexeme;
+    } else {
+      console.error("ERROR: expecting variable name");
+      return;
+    }
+    token = this.consumeToken();
+    if (!(token.type == "OPR" && token.lexeme == ":")) {
+      console.error("ERROR: expecting ':' operator");
+      return;
+    }
+    this.consumeToken();
+    value = this.parseExpression();
+
+    return {
+      LET: [key, value]
+    };
+  },
+
   // PRINT <EXP>
   PRINT: function() {
     let token = this.consumeToken();

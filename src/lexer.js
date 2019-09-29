@@ -34,7 +34,8 @@ const config = {
     "suspendupdate",
     "resumeupdate",
     "update",
-    "sleep"
+    "sleep",
+    "let",
   ],
 
   operators: ["and", "or"],

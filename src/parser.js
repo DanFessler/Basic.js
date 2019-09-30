@@ -52,6 +52,32 @@ let keywordParsers = {
     };
   },
 
+  // DIM {IDN} {GRP:"("} [{IDN} {SEP:","}] ({IDN}) {GRP:")"}
+  DIM: function() {
+    let token,
+      name,
+      params = [];
+
+    name = this.consumeToken();
+    if (name.type !== "IDN")
+      return console.log("DIM", "ERROR: Expecting identifier");
+
+    token = this.consumeToken();
+    if (!(token.type == "GRP" && token.lexeme == "("))
+      return console.log("DIM", "ERROR: Expecting '('");
+
+    do {
+      token = this.consumeToken();
+      params.push(this.parseExpression());
+      token = this.consumeToken();
+    } while (token.type == "SEP");
+
+    if (!(token.type == "GRP" && token.lexeme == ")"))
+      return console.log("DIM", "ERROR: Expecting ')'");
+
+    return { DIM: [name.lexeme, ...params] };
+  },
+
   // PRINT <EXP>
   PRINT: function() {
     let token = this.consumeToken();

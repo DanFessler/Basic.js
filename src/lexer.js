@@ -36,6 +36,7 @@ const config = {
     "update",
     "sleep",
     "let",
+    "dim"
   ],
 
   operators: ["and", "or"],

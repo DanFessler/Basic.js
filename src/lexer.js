@@ -5,6 +5,7 @@ const config = {
     { name: "SPC", pattern: /^\s+$/ },
     { name: "SEP", pattern: /^,$/ },
     { name: "GRP", pattern: /^(\(|\))$/ },
+    { name: "ARR", pattern: /^(\[|\])$/ },
     {
       name: "STR",
       pattern: /^\"([\s\S]*?)"?$/,

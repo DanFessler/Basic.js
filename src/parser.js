@@ -335,14 +335,14 @@ class Parser {
     return count == 0 ? this.tokens.slice(initialpos, this.pos) : null;
   }
 
-  parseParams() {
+  parseParams(endTok) {
     // when we begin parsing, we already looked ahead to match the opening parantheses, so advance
     this.pos = this.pos + 2;
 
     // return null if there were no params
     if (
       this.tokens[this.pos].type == "GRP" &&
-      this.tokens[this.pos].lexeme == ")"
+      this.tokens[this.pos].lexeme == endTok
     ) {
       this.pos++;
       return null;
@@ -354,7 +354,7 @@ class Parser {
       this.tokens[this.pos + 1] &&
       !(
         this.tokens[this.pos + 1].type == "GRP" &&
-        this.tokens[this.pos + 1].lexeme == ")"
+        this.tokens[this.pos + 1].lexeme == endTok
       )
     ) {
       params.push(this.parseExpression());
@@ -372,17 +372,44 @@ class Parser {
 
   parseExpression(lastPrecedence) {
     let expression;
+    let index = null;
     switch (this.tokens[this.pos].type) {
       case "IDN":
         let nextTok = this.tokens[this.pos + 1];
-        if (nextTok && (nextTok.lexeme == ":" || nextTok.lexeme == "(")) {
+        if (
+          nextTok &&
+          (nextTok.lexeme == ":" ||
+            nextTok.lexeme == "(" ||
+            nextTok.lexeme == "[")
+        ) {
           if (this.tokens[this.pos + 1].lexeme == ":") {
             expression = this.tokens[this.pos].lexeme;
           }
           if (this.tokens[this.pos + 1].lexeme == "(") {
-            expression = { [this.tokens[this.pos].lexeme]: this.parseParams() };
+            expression = {
+              [this.tokens[this.pos].lexeme]: this.parseParams(")")
+            };
           }
         } else expression = { [this.tokens[this.pos].lexeme]: null };
+
+        if (!nextTok) break;
+        expression = { [this.tokens[this.pos].lexeme]: null };
+        if (nextTok.lexeme == "(") {
+          expression = {
+            [this.tokens[this.pos].lexeme]: this.parseParams(")")
+          };
+          break;
+        }
+        if (nextTok.lexeme == "[") {
+          expression = {
+            [this.tokens[this.pos].lexeme]: this.parseParams("]")
+          };
+          nextTok = this.tokens[this.pos + 1];
+        }
+        if (nextTok && nextTok.lexeme == ":") {
+          index = expression[Object.keys(expression)[0]];
+          expression = Object.keys(expression)[0];
+        }
         break;
       case "NUM":
         expression = Number(this.tokens[this.pos].lexeme);
@@ -414,8 +441,13 @@ class Parser {
 
       if (!lastPrecedence || precedence < lastPrecedence) {
         this.pos += 2;
+        if (!index) index = [];
         expression = {
-          [opTable[operator]]: [expression, this.parseExpression(precedence)]
+          [opTable[operator]]: [
+            expression,
+            ...index,
+            this.parseExpression(precedence)
+          ]
         };
       } else {
         return expression;

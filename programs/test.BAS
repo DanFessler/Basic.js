@@ -1,9 +1,16 @@
-'testing a comment
+let size:10
+let i:0
+dim arr(size,size)
 
-i:1
-while true
-  print true and false
-  i:i+1
-  sleep 1
-wend
-a: "poop"
+for y: 0 to size - 1
+  for x: 0 to size - 1
+    arr[x,y]: i
+    i: i+1
+  next
+next
+
+for y: 0 to size - 1
+  for x: 0 to size - 1
+    print ("This is index #" + arr[x,y])
+  next
+next

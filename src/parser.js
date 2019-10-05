@@ -376,21 +376,6 @@ class Parser {
     switch (this.tokens[this.pos].type) {
       case "IDN":
         let nextTok = this.tokens[this.pos + 1];
-        if (
-          nextTok &&
-          (nextTok.lexeme == ":" ||
-            nextTok.lexeme == "(" ||
-            nextTok.lexeme == "[")
-        ) {
-          if (this.tokens[this.pos + 1].lexeme == ":") {
-            expression = this.tokens[this.pos].lexeme;
-          }
-          if (this.tokens[this.pos + 1].lexeme == "(") {
-            expression = {
-              [this.tokens[this.pos].lexeme]: this.parseParams(")")
-            };
-          }
-        } else expression = { [this.tokens[this.pos].lexeme]: null };
 
         if (!nextTok) break;
         expression = { [this.tokens[this.pos].lexeme]: null };

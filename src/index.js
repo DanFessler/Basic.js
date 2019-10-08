@@ -4,26 +4,36 @@ let basin = require("basin-script");
 
 module.exports = {
   run: (program, delay, debug) => {
-    program = Lexer(program);
+    try {
+      program = Lexer(program);
+    } catch (e) {
+      return;
+    }
 
-    if (debug)
-      // Print out lexed tokens
+    // Print out lexed tokens
+    if (debug) {
       console.log("Program TOKENS:", "\n" + JSON.stringify(program, null, 1));
+    }
 
-    program = Parser(
-      // Filter out ignorable tokens before passing to the parser
-      program.filter(token => {
-        return !["COM", "SPC", "END"].includes(token.type);
-      })
-    );
+    try {
+      program = Parser(
+        // Filter out ignorable tokens before passing to the parser
+        program.filter(token => {
+          return !["COM", "SPC", "END"].includes(token.type);
+        })
+      );
+    } catch (e) {
+      return;
+    }
 
-    if (debug)
-      // Print out generated Abstract Syntax Tree
+    // Print out generated Abstract Syntax Tree
+    if (debug) {
       console.log(
         "Program AST:",
         "\n" + JSON.stringify(program, null, 1),
         "\n\nResult:"
       );
+    }
 
     basin.start(program, delay);
   },

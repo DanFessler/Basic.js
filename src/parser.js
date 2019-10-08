@@ -36,12 +36,12 @@ let keywordParsers = {
     if (token.type == "IDN") {
       key = token.lexeme;
     } else {
-      console.error("ERROR: expecting variable name");
+      this.error("expecting variable name");
       return;
     }
     token = this.consumeToken();
     if (!(token.type == "OPR" && token.lexeme == ":")) {
-      console.error("ERROR: expecting ':' operator");
+      this.error("expecting ':' operator");
       return;
     }
     this.consumeToken();
@@ -59,12 +59,11 @@ let keywordParsers = {
       params = [];
 
     name = this.consumeToken();
-    if (name.type !== "IDN")
-      return console.log("DIM", "ERROR: Expecting identifier");
+    if (name.type !== "IDN") this.error("DIM Expecting identifier");
 
     token = this.consumeToken();
     if (!(token.type == "GRP" && token.lexeme == "("))
-      return console.log("DIM", "ERROR: Expecting '('");
+      this.error("DIM Expecting '('");
 
     do {
       token = this.consumeToken();
@@ -73,7 +72,7 @@ let keywordParsers = {
     } while (token.type == "SEP");
 
     if (!(token.type == "GRP" && token.lexeme == ")"))
-      return console.log("DIM", "ERROR: Expecting ')'");
+      this.error("DIM Expecting ')'");
 
     return { DIM: [name.lexeme, ...params] };
   },
@@ -109,7 +108,7 @@ let keywordParsers = {
       line.script = [new Parser(ifBody).parse(), elseBody ? elseBody : null];
       return line;
     } else {
-      console.error(`ERROR: expecting 'ENDIF'`);
+      this.error("expecting 'ENDIF'");
       return;
     }
   },
@@ -138,7 +137,7 @@ let keywordParsers = {
       line.script.push(new Parser(blockTokens).parse());
       return line;
     } else {
-      console.error(`ERROR: expected 'WEND'`);
+      this.error("expected 'WEND'");
       return;
     }
   },
@@ -154,19 +153,19 @@ let keywordParsers = {
     if (token.type == "IDN") {
       key = token.lexeme;
     } else {
-      console.error("ERROR: expecting variable name");
+      this.error("expecting variable name");
       return;
     }
     token = this.consumeToken();
     if (!(token.type == "OPR" && token.lexeme == ":")) {
-      console.error("ERROR: expecting ':' operator");
+      this.error("expecting ':' operator");
       return;
     }
     this.consumeToken();
     start = this.parseExpression();
     token = this.consumeToken();
     if (!(token.type == "KEY" && token.lexeme.toUpperCase() == "TO")) {
-      console.error("ERROR: expecting 'TO' keyword");
+      this.error("expecting 'TO' keyword");
       return;
     }
     this.consumeToken();
@@ -187,7 +186,7 @@ let keywordParsers = {
       };
       return line;
     } else {
-      console.error(`ERROR: expected 'NEXT'`);
+      this.error(`expected 'NEXT'`);
       return;
     }
   },
@@ -199,11 +198,11 @@ let keywordParsers = {
       params = [];
 
     name = this.consumeToken();
-    if (name.type !== "IDN") return console.log("ERROR: Expecting identifier");
+    if (name.type !== "IDN") return this.error("Expecting identifier");
 
     token = this.consumeToken();
     if (!(token.type == "GRP" && token.lexeme == "("))
-      return console.log("ERROR: Expecting '('");
+      return this.error("Expecting '('");
 
     do {
       token = this.consumeToken();
@@ -211,12 +210,12 @@ let keywordParsers = {
         params.push(token.lexeme);
         token = this.consumeToken();
       } else if (!(token.type == "GRP" && token.lexeme == ")")) {
-        return console.log("ERROR: Expecting identifier");
+        return this.error("Expecting identifier");
       }
     } while (token.type == "SEP");
 
     if (!(token.type == "GRP" && token.lexeme == ")"))
-      return console.log("ERROR: Expecting ')'");
+      return this.error("Expecting ')'");
 
     let functionBody = this.findBlockContents("function", "endfunction", 1);
 
@@ -226,7 +225,7 @@ let keywordParsers = {
         script: new Parser(functionBody).parse()
       };
     } else {
-      console.error(`ERROR: expected 'ENDFUNCTION'`);
+      this.error(`expected 'ENDFUNCTION'`);
       return;
     }
   },
@@ -272,7 +271,7 @@ class Parser {
             this.program.unshift(keywordParser.call(this));
           } else this.program.push(keywordParser.call(this));
         } else {
-          console.log(`ERROR: Unrecognized keyword '${token.lexeme}'`);
+          this.error(`Unrecognized keyword '${token.lexeme}'`);
         }
       } else {
         // Otherwise try to parse it as an expression
@@ -285,6 +284,11 @@ class Parser {
     return this.program;
   }
 
+  error(e) {
+    console.error(`Syntax Error: ${e}`);
+    throw { status: "SyntaxError", result: e };
+  }
+
   consumeToken(expectedToken, suppressLog) {
     this.pos++;
     let token = this.tokens[this.pos];
@@ -295,8 +299,7 @@ class Parser {
       ) {
         return token;
       } else {
-        if (!suppressLog)
-          console.error(`ERROR: expected '${expectedToken.lexeme}'`);
+        if (!suppressLog) this.error(`expected '${expectedToken.lexeme}'`);
         return null;
       }
     } else return token;
@@ -410,11 +413,11 @@ class Parser {
           let group = this.findBlockContents("(", ")", 1);
           expression = new Parser(group).parse();
         } else {
-          console.log("ERROR: expecting '('");
+          this.error("expecting '('");
         }
         break;
       default:
-        return console.log("ERROR: expecting expression");
+        return this.error("expecting expression");
     }
     while (
       this.tokens[this.pos + 1] &&

@@ -137,19 +137,22 @@ class Lexer {
       // if no rule matched, Error
       if (thisTok.type === null) {
         var rx = new RegExp(`(?:.*?\n){${this.line - 1}}(.+?)\n`, "s");
+        let line = string.match(rx)[1];
         let linePrefix = `${this.line} | `;
+        let error = `Syntax Error: Unexpected Token '${
+          string[this.pos]
+        }' on line ${this.line}:${this.char - 1}`;
+
         console.error(
-          "\x1b[31m%s\x1b[0m",
-          `\nSyntaxError: Unexpected Token '${string[this.pos]}' on line ${
-            this.line
-          }:${this.char - 1}`,
-          "\n" +
-            "\u001b[38;5;239m" +
-            linePrefix +
-            "\x1b[0m" +
-            `${string.match(rx)[1]}\n`,
-          " ".repeat(this.char - 3 + linePrefix.length) + "^\n"
+          `${error}`,
+          `\n${linePrefix}${line}\n`,
+          " ".repeat(this.char - 2 + linePrefix.length) + "^"
         );
+
+        throw {
+          status: "SyntaxError",
+          result: error
+        };
         break;
       }
     }

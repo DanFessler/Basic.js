@@ -13,7 +13,7 @@ The core language is small and platform agnostic. As such, there are very few ke
 - [x] functions
 - [x] Arrays
 - [x] Bool literals
-- [ ] library imports
+- [x] library imports
 - [ ] objects
 
 ## keywords

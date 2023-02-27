@@ -380,8 +380,8 @@ class Parser {
       case "IDN":
         let nextTok = this.tokens[this.pos + 1];
 
-        if (!nextTok) break;
         expression = { [this.tokens[this.pos].lexeme]: null };
+        if (!nextTok) break;
         if (nextTok.lexeme == "(") {
           expression = {
             [this.tokens[this.pos].lexeme]: this.parseParams(")")

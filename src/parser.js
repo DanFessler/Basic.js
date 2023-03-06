@@ -30,40 +30,40 @@ let precedenceTable = {
 
 let keywordParsers = {
   // LET {IDN} {OPR:":"} <EXP>
-  LET: function() {
+  LET: function () {
     let token, key, value;
     token = this.consumeToken();
     if (token.type == "IDN") {
       key = token.lexeme;
     } else {
-      this.error("expecting variable name");
+      this.error("expecting variable name", token);
       return;
     }
     token = this.consumeToken();
     if (!(token.type == "OPR" && token.lexeme == ":")) {
-      this.error("expecting ':' operator");
+      this.error("expecting ':' operator", token);
       return;
     }
     this.consumeToken();
     value = this.parseExpression();
 
     return {
-      LET: [key, value]
+      LET: [key, value],
     };
   },
 
   // DIM {IDN} {GRP:"("} [{IDN} {SEP:","}] ({IDN}) {GRP:")"}
-  DIM: function() {
+  DIM: function () {
     let token,
       name,
       params = [];
 
     name = this.consumeToken();
-    if (name.type !== "IDN") this.error("DIM Expecting identifier");
+    if (name.type !== "IDN") this.error("DIM Expecting identifier", token);
 
     token = this.consumeToken();
     if (!(token.type == "GRP" && token.lexeme == "("))
-      this.error("DIM Expecting '('");
+      this.error("DIM Expecting '('", token);
 
     do {
       token = this.consumeToken();
@@ -72,23 +72,23 @@ let keywordParsers = {
     } while (token.type == "SEP");
 
     if (!(token.type == "GRP" && token.lexeme == ")"))
-      this.error("DIM Expecting ')'");
+      this.error("DIM Expecting ')'", token);
 
     return { DIM: [name.lexeme, ...params] };
   },
 
   // PRINT <EXP>
-  PRINT: function() {
+  PRINT: function () {
     let token = this.consumeToken();
     let line = {
-      PRINT: token.type == "STR" ? token.lexeme : this.parseExpression()
+      PRINT: token.type == "STR" ? token.lexeme : this.parseExpression(),
     };
     return line;
   },
 
   // IF <EXP> <SCRIPT> ([ELSEIF <EXP> <SCRIPT>]) (ELSE <SCRIPT>) ENDIF
-  IF: function() {
-    this.consumeToken();
+  IF: function () {
+    let tok = this.consumeToken();
     let line = { IF: this.parseExpression() };
     let ifBody = this.findBlockContents("if", ["elseif", "else", "endif"], 1);
 
@@ -108,28 +108,28 @@ let keywordParsers = {
       line.script = [new Parser(ifBody).parse(), elseBody ? elseBody : null];
       return line;
     } else {
-      this.error("expecting 'ENDIF'");
+      this.error("expecting 'ENDIF'", tok);
       return;
     }
   },
 
   // SUSPENDUPDATE
-  SUSPENDUPDATE: function() {
+  SUSPENDUPDATE: function () {
     return { SUSPENDUPDATE: null };
   },
 
   // RESUMEUPDATE
-  RESUMEUPDATE: function() {
+  RESUMEUPDATE: function () {
     return { RESUMEUPDATE: null };
   },
 
   // UPDATE
-  UPDATE: function() {
+  UPDATE: function () {
     return { UPDATE: null };
   },
 
   // WHILE <EXP> <SCRIPT> WEND
-  WHILE: function() {
+  WHILE: function () {
     this.consumeToken();
     let line = { WHILE: null, script: [[this.parseExpression()]] };
     let blockTokens = this.findBlockContents("while", "wend", 1);
@@ -143,7 +143,7 @@ let keywordParsers = {
   },
 
   // FOR {IDN} {OPR:":"} <EXP> TO <EXP> (STEP <EXP>) <SCRIPT> NEXT
-  FOR: function() {
+  FOR: function () {
     let token,
       key,
       start,
@@ -182,7 +182,7 @@ let keywordParsers = {
     if (blockTokens) {
       let line = {
         FOR: [key, start, end, step],
-        script: new Parser(blockTokens).parse()
+        script: new Parser(blockTokens).parse(),
       };
       return line;
     } else {
@@ -192,7 +192,7 @@ let keywordParsers = {
   },
 
   // FUNCTION {IDN} {GRP:"("} [{IDN} {SEP:","}] ({IDN}) {GRP:")"} <SCRIPT> ENDFUNCTION
-  FUNCTION: function() {
+  FUNCTION: function () {
     let token,
       name,
       params = [];
@@ -222,7 +222,7 @@ let keywordParsers = {
     if (functionBody) {
       return {
         FUNCTION: [name.lexeme, ...params],
-        script: new Parser(functionBody).parse()
+        script: new Parser(functionBody).parse(),
       };
     } else {
       this.error(`expected 'ENDFUNCTION'`);
@@ -231,22 +231,22 @@ let keywordParsers = {
   },
 
   // RETURN <EXP>
-  RETURN: function() {
+  RETURN: function () {
     let token = this.consumeToken();
     let line = {
-      RETURN: this.parseExpression()
+      RETURN: this.parseExpression(),
     };
     return line;
   },
 
   // SLEEP <EXP>
-  SLEEP: function() {
+  SLEEP: function () {
     let token = this.consumeToken();
     let line = {
-      SLEEP: this.parseExpression()
+      SLEEP: this.parseExpression(),
     };
     return line;
-  }
+  },
 };
 
 class Parser {
@@ -267,11 +267,16 @@ class Parser {
       let keywordParser = this.keywords[token.lexeme.toUpperCase()];
       if (token.type == "KEY") {
         if (keywordParser) {
+          let node = { ...keywordParser.call(this), token };
+
+          // if token is a function, hoist to the top
           if (token.lexeme.toUpperCase() == "FUNCTION") {
-            this.program.unshift(keywordParser.call(this));
-          } else this.program.push(keywordParser.call(this));
+            this.program.unshift(node);
+          } else {
+            this.program.push(node);
+          }
         } else {
-          this.error(`Unrecognized keyword '${token.lexeme}'`);
+          this.error(`Unrecognized keyword '${token.lexeme}'`, token);
         }
       } else {
         // Otherwise try to parse it as an expression
@@ -284,9 +289,9 @@ class Parser {
     return this.program;
   }
 
-  error(e) {
-    console.error(`Syntax Error: ${e}`);
-    throw { status: "SyntaxError", result: e };
+  error(e, token) {
+    // console.log(token);
+    throw { status: "Syntax Error", result: e, token };
   }
 
   consumeToken(expectedToken, suppressLog) {
@@ -376,21 +381,23 @@ class Parser {
   parseExpression(lastPrecedence) {
     let expression;
     let index = null;
-    switch (this.tokens[this.pos].type) {
+    let thisTok = this.tokens[this.pos];
+
+    switch (thisTok.type) {
       case "IDN":
         let nextTok = this.tokens[this.pos + 1];
 
-        expression = { [this.tokens[this.pos].lexeme]: null };
+        expression = { [thisTok.lexeme]: null };
         if (!nextTok) break;
         if (nextTok.lexeme == "(") {
           expression = {
-            [this.tokens[this.pos].lexeme]: this.parseParams(")")
+            [thisTok.lexeme]: this.parseParams(")"),
           };
-          break;
+          //break;
         }
         if (nextTok.lexeme == "[") {
           expression = {
-            [this.tokens[this.pos].lexeme]: this.parseParams("]")
+            [thisTok.lexeme]: this.parseParams("]"),
           };
           nextTok = this.tokens[this.pos + 1];
         }
@@ -398,27 +405,35 @@ class Parser {
           index = expression[Object.keys(expression)[0]];
           expression = Object.keys(expression)[0];
         }
+        // expression.token = thisTok;
         break;
       case "NUM":
-        expression = Number(this.tokens[this.pos].lexeme);
+        expression = Number(thisTok.lexeme);
         break;
       case "BOOL":
-        expression = this.tokens[this.pos].lexeme.toLowerCase() == "true";
+        expression = thisTok.lexeme.toLowerCase() == "true";
         break;
       case "STR":
-        expression = this.tokens[this.pos].lexeme;
+        expression = thisTok.lexeme;
         break;
       case "GRP":
-        if (this.tokens[this.pos].lexeme == "(") {
+        if (thisTok.lexeme == "(") {
           let group = this.findBlockContents("(", ")", 1);
           expression = new Parser(group).parse();
         } else {
-          this.error("expecting '('");
+          this.error(`Unexpected Token '${thisTok.lexeme}'`, thisTok);
         }
         break;
       default:
-        return this.error("expecting expression");
+        return this.error("expecting expression", thisTok);
     }
+
+    // Adding the token here for runtime error line/char reporting,
+    // but since basin uses primitives for numbers, bools, and strings,
+    // I can't attach a token to those.
+    if (typeof expression === "object")
+      expression.token = this.tokens[this.pos];
+
     while (
       this.tokens[this.pos + 1] &&
       this.tokens[this.pos + 1].type == "OPR"
@@ -434,8 +449,8 @@ class Parser {
           [opTable[operator]]: [
             expression,
             ...index,
-            this.parseExpression(precedence)
-          ]
+            this.parseExpression(precedence),
+          ],
         };
       } else {
         return expression;

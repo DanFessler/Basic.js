@@ -59,7 +59,12 @@ class Lexer {
 
   tokenize(string) {
     while (this.pos < string.length) {
-      let thisTok = { type: null, lexeme: "" };
+      let thisTok = {
+        type: null,
+        lexeme: "",
+        line: this.line,
+        char: this.char,
+      };
 
       // Loop through rules to find type match
       for (let i = 0; i < this.rules.length; i++) {
@@ -78,7 +83,7 @@ class Lexer {
             // Update line:char tracking
             if (string[this.pos] == "\n") {
               this.line++;
-              this.char = 1;
+              this.char = 0;
             }
             this.pos++;
             this.char++;
@@ -136,22 +141,10 @@ class Lexer {
 
       // if no rule matched, Error
       if (thisTok.type === null) {
-        var rx = new RegExp(`(?:.*?\n){${this.line - 1}}(.+?)\n`, "s");
-        let line = string.match(rx)[1];
-        let linePrefix = `${this.line} | `;
-        let error = `Syntax Error: Unexpected Token '${
-          string[this.pos]
-        }' on line ${this.line}:${this.char - 1}`;
-
-        console.error(
-          `${error}`,
-          `\n${linePrefix}${line}\n`,
-          " ".repeat(this.char - 2 + linePrefix.length) + "^"
-        );
-
         throw {
-          status: "SyntaxError",
-          result: error
+          status: "Syntax Error",
+          result: `Unexpected Token '${string[this.pos]}'`,
+          token: thisTok,
         };
         break;
       }

@@ -5,7 +5,8 @@ let basin = require("basin-script");
 
 
 module.exports = {
-  run: (program, delay, debug) => {
+  basin,
+  run: async (program, delay, debug) => {
     let tokens;
     try {
       tokens = Lexer(program);
@@ -15,7 +16,7 @@ module.exports = {
 
     // Print out lexed tokens
     if (debug) {
-      console.log("Program TOKENS:", "\n" + JSON.stringify(program, null, 1));
+      console.log("Program TOKENS:", "\n" + JSON.stringify(tokens, null, 1));
     }
 
     let ast;
@@ -23,7 +24,7 @@ module.exports = {
       ast = Parser(
         // Filter out ignorable tokens before passing to the parser
         tokens.filter((token) => {
-          return !["COM", "SPC", "END"].includes(token.type);
+          return !["COM", "SPC"].includes(token.type);
         })
       );
     } catch (e) {
@@ -39,7 +40,11 @@ module.exports = {
       );
     }
 
-    basin.start(ast, delay);
+    try {
+      await basin.start(ast, delay);
+    } catch (e) {
+      throw e;
+    }
   },
   stop: () => {
     basin.stop();

@@ -10,10 +10,10 @@ if (process.argv.length < 3) {
 let fs = require("fs");
 let filename = process.argv[2];
 
-fs.readFile(filename, "utf8", function(err, data) {
+fs.readFile(filename, "utf8", async function (err, data) {
   if (err) throw err;
   try {
-    BASIC.run(data, null, false);
+    await BASIC.run(data, null, true);
   } catch (e) {
     // internal error
     if (!e.status) {

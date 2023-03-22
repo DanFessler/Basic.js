@@ -1,5 +1,9 @@
-const BASIC = require("./src");
-BASIC.import(require("./plugins/testPlugin"));
+// const BASIC = require("./src");
+import BASIC from "./src/index.js";
+import plugin from "./plugins/testPlugin.js";
+import fs from "fs";
+
+BASIC.import(plugin);
 
 // Make sure we got a filename on the command line.
 if (process.argv.length < 3) {
@@ -7,7 +11,6 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 // Read the file and print its contents.
-let fs = require("fs");
 let filename = process.argv[2];
 
 fs.readFile(filename, "utf8", async function (err, data) {
@@ -32,8 +35,8 @@ fs.readFile(filename, "utf8", async function (err, data) {
 
         console.error(
           "\n\x1b[31m" +
-            `${status}!\n` +
-            `${result} on line ${token.line}:${token.char}\n\n` +
+            `${status} on line ${token.line}:${token.char}\n` +
+            `${result}\n\n` +
             `${linePrefix}${line}\n` +
             " ".repeat(token.char - 1 + linePrefix.length) +
             "^" +

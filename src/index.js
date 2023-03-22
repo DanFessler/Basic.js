@@ -1,10 +1,12 @@
-const Lexer = require("./lexer.js");
-const Parser = require("./parser.js");
-let basin = require("basin-script");
+// const Lexer = require("./lexer.js");
+// const Parser = require("./parser.js");
+// let basin = require("basin-script");
 
+import Lexer from "./lexer.js";
+import Parser from "./parser.js";
+import basin from "basin-script";
 
-
-module.exports = {
+export default {
   run: (program, delay, debug) => {
     let tokens;
     try {
@@ -20,12 +22,12 @@ module.exports = {
 
     let ast;
     try {
-      ast = Parser(
+      ast = new Parser(
         // Filter out ignorable tokens before passing to the parser
         tokens.filter((token) => {
           return !["COM", "SPC", "END"].includes(token.type);
         })
-      );
+      ).parse();
     } catch (e) {
       throw e;
     }

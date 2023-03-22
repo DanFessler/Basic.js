@@ -1,5 +1,10 @@
-dim test(2)
-test[0]: "poop"
-test[1]: "cheese"
-let num:2
-print test(num)
+
+' function poop(string)
+'   print ("poopy " + string)
+' endfunction
+
+' ' poop("test"): "cheese"
+' poop("test")
+
+myvar: 12
+print myvar

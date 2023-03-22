@@ -154,4 +154,4 @@ class Lexer {
   }
 }
 
-module.exports = data => new Lexer(config).tokenize(data);
+export default (data) => new Lexer(config).tokenize(data);

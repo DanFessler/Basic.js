@@ -15,3 +15,9 @@ it's possible to get computed values like NULL, NaN, and Undefined passed to BAS
 discovered I can get the value of an array with both () as well as [], but only can set with []. Not desirable.
 
 Also when attempting to access out of range index with a number primitive, line:char isn't being reported
+
+# Array assignment
+so I "fixed" it so that assignment can work both with () as well as [], however this leads to situations where you can assign to a function call as that also uses parenthesis.  I'm not sure exactly what happens when you do this internally, but it effectively stops the function from working without throwing any errors. If I am to allow assignment with (), I need to error handle better for invalid assignments.
+
+# Line/char tracking on key parsers
+I'm currently not tracking line/char within key parsers. Error messages can get confusing as they point to the wrong place.

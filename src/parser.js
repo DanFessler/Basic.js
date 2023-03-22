@@ -35,6 +35,7 @@ class Parser {
     this.program = [];
     this.pos = 0;
     this.tokens = tokens;
+    this.keyParsers = keywordParsers;
   }
 
   error(e, token) {
@@ -102,6 +103,7 @@ class Parser {
             token,
           };
         }
+
       }
 
       // Otherwise try to parse it as an expression
@@ -240,6 +242,7 @@ class Parser {
         [operatorKey]: [expression, ...index, this.parseExpression(precedence)],
       };
     }
+
     return expression;
   }
 

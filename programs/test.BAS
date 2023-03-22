@@ -6,5 +6,6 @@
 ' ' poop("test"): "cheese"
 ' poop("test")
 
-myvar: 12
-print myvar
+dim myarr(2, 2)
+myarr[3,0]:1
+print myarr[0]

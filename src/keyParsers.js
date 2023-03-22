@@ -70,7 +70,7 @@ export default {
       // recursively call if parser for each elseif statement
       // which gets nested in each if's elsebody
       if (this.tokens[this.pos].lexeme.toLowerCase() == "elseif") {
-        elseBody = this.keywords.IF.call(this);
+        elseBody = this.keyParsers.IF.call(this);
       }
 
       if (this.tokens[this.pos].lexeme.toLowerCase() == "else") {
